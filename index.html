@@ -1,0 +1,3138 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#dc2626">
+    <title>Panjat Pinang Sosiologi - SMA Negeri 1 Tambakboyo</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- jsPDF & AutoTable untuk Unduh PDF Rapi -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800;900&display=swap');
+
+        :root {
+            --merah-utama: #dc2626;
+            --biru-utama: #2563eb;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #7f1d1d, #dc2626, #ef4444, #f8fafc);
+            background-size: 400% 400%;
+            animation: animatedBG 15s ease infinite;
+            color: #1e293b;
+            min-height: 100dvh;
+            margin: 0;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            overflow-x: hidden;
+            touch-action: manipulation;
+        }
+
+        h1, h2, h3, .fun-font {
+            font-family: 'Baloo 2', cursive;
+        }
+
+        @keyframes animatedBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* NAVIGASI LAYAR */
+        .layar {
+            display: none;
+            width: 100%;
+            min-height: 100dvh;
+            position: relative;
+            z-index: 10;
+        }
+        .layar.aktif {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* OVERLAY MODAL */
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(6px);
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            padding: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .overlay.tampil {
+            display: flex;
+            opacity: 1;
+        }
+
+        /* PANEL KACA 3D */
+        .theme-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px;
+            border: 4px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25), inset 0 0 20px rgba(255, 255, 255, 0.6);
+        }
+
+        /* ELEMEN MELAYANG BACKGROUND */
+        .floating-bg-item {
+            position: fixed;
+            opacity: 0.15;
+            pointer-events: none;
+            user-select: none;
+            z-index: 1;
+            animation: floatUp linear infinite;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(110vh) rotate(0deg) scale(0.8); opacity: 0; }
+            10% { opacity: 0.2; }
+            90% { opacity: 0.2; }
+            100% { transform: translateY(-15vh) rotate(360deg) scale(1.2); opacity: 0; }
+        }
+
+        /* ANIMASI */
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-4px, 0, 0) rotate(-2deg); }
+            20%, 80% { transform: translate3d(6px, 0, 0) rotate(2deg); }
+            30%, 50%, 70% { transform: translate3d(-8px, 0, 0) rotate(-2deg); }
+            40%, 60% { transform: translate3d(8px, 0, 0) rotate(2deg); }
+        }
+
+        .pop {
+            animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes pop {
+            0% { transform: scale(0.6); opacity: 0; }
+            80% { transform: scale(1.08); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .pulse-danger {
+            animation: pulseDanger 1s infinite;
+        }
+        @keyframes pulseDanger {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
+            50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+        }
+
+        /* TOMBOL 3D */
+        .btn-3d {
+            transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+            border-bottom: 5px solid rgba(0, 0, 0, 0.25);
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            top: 0;
+        }
+        .btn-3d:active:not(:disabled) {
+            top: 4px;
+            border-bottom-width: 1px;
+        }
+        .btn-3d:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            filter: grayscale(0.4);
+        }
+
+        /* TOMBOL JAWABAN REGU */
+        .btn-answer {
+            transition: all 0.15s ease-out;
+            border: 2px solid #e2e8f0;
+            border-bottom: 5px solid #cbd5e1;
+            min-height: 52px; /* Ditingkatkan untuk area sentuh mobile */
+            overflow-wrap: break-word;
+            word-break: break-word;
+            user-select: none;
+            position: relative;
+            top: 0;
+        }
+        .btn-answer:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.15);
+            border-color: #cbd5e1;
+        }
+        .btn-answer:active:not(:disabled) {
+            top: 3px;
+            border-bottom-width: 2px;
+            transform: translateY(0);
+        }
+
+        /* TIANG PINANG VISUAL */
+        .tiang-batang {
+            background: repeating-linear-gradient(
+                0deg,
+                #78350f 0px,
+                #78350f 20px,
+                #92400e 20px,
+                #92400e 25px,
+                #451a03 25px,
+                #451a03 45px
+            );
+            box-shadow: inset -5px 0 10px rgba(0,0,0,0.5), inset 5px 0 10px rgba(255,255,255,0.25);
+            border: 2px solid #291002;
+        }
+
+        .pemanjat-transisi {
+            transition: bottom 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* GAMBAR / DIAGRAM VISUAL DALAM KOTAK SOAL */
+        .visual-img-container {
+            width: 100%;
+            height: auto;
+            max-height: 180px; /* Disesuaikan agar proporsional */
+            aspect-ratio: 16 / 9; /* Menjaga rasio aspek */
+            background: #f1f5f9;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            overflow: hidden;
+            position: relative;
+            padding: 6px;
+        }
+        .visual-img-container svg {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Penting agar SVG tidak melar */
+        }
+
+        /* TABEL RESPONSIVE DASBOR */
+        @media (max-width: 640px) {
+            .tabel-rekap thead { display: none; }
+            .tabel-rekap, .tabel-rekap tbody, .tabel-rekap tr, .tabel-rekap td {
+                display: block;
+                width: 100%;
+            }
+            .tabel-rekap tr {
+                margin-bottom: 1rem;
+                background: #ffffff;
+                border: 2px solid #fecaca;
+                border-radius: 16px;
+                padding: 0.75rem;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            }
+            .tabel-rekap td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.4rem 0.25rem;
+                border-bottom: 1px dashed #e2e8f0;
+                text-align: right;
+                font-size: 0.85rem;
+            }
+            .tabel-rekap td:last-child { border-bottom: none; }
+            .tabel-rekap td::before {
+                content: attr(data-label);
+                font-weight: 900;
+                color: #475569;
+                text-align: left;
+                padding-right: 0.5rem;
+            }
+        }
+
+        #areaCetak { display: none; }
+        @media print {
+            @page { size: A4 landscape; margin: 10mm; }
+            body > *:not(#areaCetak) { display: none !important; }
+            #areaCetak {
+                display: block !important;
+                background: white !important;
+                color: black !important;
+                width: 100%;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PITA ERROR GLOBAL -->
+    <div id="pita-error" style="display:none;" class="fixed top-0 left-0 right-0 z-[100] bg-red-700 text-white text-xs font-bold px-4 py-2 text-center shadow-lg"></div>
+
+    <!-- PITA MODE PREVIEW -->
+    <div id="pita-preview" style="display:none;" class="relative z-40 bg-amber-300 text-amber-950 text-xs md:text-sm font-extrabold px-3 py-1.5 text-center border-b-2 border-amber-500 shadow-sm">
+        🛠️ MODE PREVIEW: Data tersimpan di perangkat ini; pasang di Google Apps Script untuk integrasi Google Sheet.
+    </div>
+
+    <!-- WADAH BACKGROUND MELAYANG -->
+    <div id="dynamic-bg" class="fixed inset-0 pointer-events-none z-0 overflow-hidden"></div>
+
+    <!-- ==========================================
+         1. LAYAR START (MENU UTAMA)
+         ========================================== -->
+    <section class="layar aktif items-center justify-center p-4 md:p-6" id="layar-start">
+        <div class="w-full max-w-xl theme-panel p-6 md:p-8 relative my-auto">
+            
+            <!-- Baris Atas: Toggle Suara & Dasbor Guru -->
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b-2 border-slate-200">
+                <div class="flex items-center gap-2">
+                    <button type="button" id="btn-toggle-narator-start" class="btn-3d bg-red-600 hover:bg-red-700 text-white text-xs md:text-sm font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5">
+                        <span>🗣️</span> <span class="label-narator">Narator: ON</span>
+                    </button>
+                    <button type="button" id="btn-toggle-sfx-start" class="btn-3d bg-blue-600 hover:bg-blue-700 text-white text-xs md:text-sm font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5">
+                        <span>🔊</span> <span class="label-sfx">Suara Efek: ON</span>
+                    </button>
+                    <button type="button" id="btn-fullscreen-start" class="btn-3d bg-purple-600 hover:bg-purple-700 text-white text-xs md:text-sm font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5" title="Layar Penuh">
+                        <i class="fas fa-expand"></i> <span class="hidden sm:inline">Layar Penuh</span>
+                    </button>
+                </div>
+                <button type="button" id="btn-buka-dasbor" class="btn-3d bg-slate-800 hover:bg-slate-900 text-white text-xs md:text-sm font-bold px-4 py-2 rounded-xl flex items-center gap-1.5">
+                    <span>📊</span> Dasbor Guru
+                </button>
+            </div>
+
+            <!-- Header Identitas & Judul -->
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center gap-2 bg-red-100 text-red-800 border-2 border-red-300 px-4 py-1.5 rounded-full text-xs md:text-sm font-extrabold mb-3">
+                    SMA Negeri 1 Tambakboyo - Tuban
+                </div>
+                <div class="pop text-6xl md:text-7xl my-2 select-none">
+                    🎋🏆🎋
+                </div>
+                <h1 class="fun-font font-extrabold text-red-700 leading-tight drop-shadow-sm mt-2" style="font-size: clamp(2rem, 5vw, 3rem);">
+                    PANJAT PINANG <span class="text-blue-700">SOSIOLOGI</span>
+                </h1>
+                <p class="text-slate-700 font-extrabold text-sm md:text-base mt-1">
+                    Materi : Tipe-Tipe Kelompok Sosial Kelas : X
+                </p>
+                <p class="text-xs font-bold text-slate-500 mt-2">
+                    ✨ Game by <span class="text-red-700 underline decoration-wavy">Boedi Darmawan, S.Sos</span>
+                </p>
+            </div>
+
+            <!-- KARTU PEMULIHAN SESI -->
+            <div id="kartu-lanjutkan" style="display:none;" class="mb-6 bg-amber-50 border-2 border-amber-400 rounded-2xl p-5 shadow-md">
+                <div class="flex items-start gap-4">
+                    <div class="text-4xl animate-bounce">⏳</div>
+                    <div class="flex-1">
+                        <h3 class="fun-font text-lg md:text-xl font-extrabold text-amber-900 leading-snug">Lanjutkan Pertandingan Sebelumnya?</h3>
+                        <p id="info-lanjutkan" class="text-xs md:text-sm font-bold text-amber-800 mt-1">
+                            Pertandingan masih tersisa.
+                        </p>
+                        <div class="flex flex-wrap gap-2 mt-4">
+                            <button type="button" id="btn-lanjutkan-sesi" class="btn-3d bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-extrabold px-5 py-2.5 rounded-xl">
+                                ▶️ Lanjutkan
+                            </button>
+                            <button type="button" id="btn-reset-sesi" class="btn-3d bg-rose-600 hover:bg-rose-700 text-white text-sm font-extrabold px-5 py-2.5 rounded-xl">
+                                🔄 Mulai Ulang Baru
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Pengaturan Pertandingan -->
+            <div class="bg-gradient-to-b from-slate-50 to-white border-2 border-slate-200 rounded-2xl p-5 mb-5 shadow-sm">
+                
+                <!-- Pilihan Kelas -->
+                <div class="mb-4">
+                    <label for="select-kelas" class="block text-xs md:text-sm font-extrabold text-slate-700 uppercase mb-1.5">
+                        🏫 Pilih Kelas Pertandingan <span class="text-red-600">*</span>
+                    </label>
+                    <select id="select-kelas" class="w-full px-4 py-3 rounded-xl border-2 border-slate-300 font-extrabold text-sm text-slate-800 bg-white focus:outline-none focus:border-red-500 transition-colors">
+                        <option value="10-1">Kelas 10-1</option>
+                        <option value="10-2" selected>Kelas 10-2</option>
+                        <option value="10-3">Kelas 10-3</option>
+                        <option value="10-4">Kelas 10-4</option>
+                        <option value="10-5">Kelas 10-5</option>
+                        <option value="10-6">Kelas 10-6</option>
+                        <option value="10-7">Kelas 10-7</option>
+                        <option value="LAINNYA">Lainnya (ketik sendiri)</option>
+                    </select>
+                </div>
+
+                <div id="wadah-kelas-lainnya" style="display:none;" class="mb-4 pop">
+                    <input type="text" id="input-kelas-lainnya" maxlength="30" placeholder="Ketik nama kelas (misal: 10-8)"
+                        class="w-full px-4 py-3 rounded-xl border-2 border-amber-400 font-extrabold text-sm text-slate-800 bg-white focus:outline-none focus:border-amber-600">
+                </div>
+
+                <!-- 2 Pohon Pinang (Kelompok 1 & 2) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="bg-red-50 border-2 border-red-300 rounded-xl p-3.5 hover:shadow-md transition-shadow">
+                        <label for="input-regu-merah" class="block text-xs font-extrabold text-red-900 uppercase mb-1.5">
+                            🔴 Pohon Pinang Kiri
+                        </label>
+                        <input type="text" id="input-regu-merah" value="Kelompok 1" maxlength="40" placeholder="Kelompok 1"
+                            class="w-full px-3 py-2.5 rounded-lg border-2 border-red-300 font-extrabold text-sm text-slate-800 focus:outline-none focus:border-red-600 bg-white">
+                    </div>
+                    <div class="bg-blue-50 border-2 border-blue-300 rounded-xl p-3.5 hover:shadow-md transition-shadow">
+                        <label for="input-regu-biru" class="block text-xs font-extrabold text-blue-900 uppercase mb-1.5">
+                            🔵 Pohon Pinang Kanan
+                        </label>
+                        <input type="text" id="input-regu-biru" value="Kelompok 2" maxlength="40" placeholder="Kelompok 2"
+                            class="w-full px-3 py-2.5 rounded-lg border-2 border-blue-300 font-extrabold text-sm text-slate-800 focus:outline-none focus:border-blue-600 bg-white">
+                    </div>
+                </div>
+
+                <p id="pesan-validasi-start" style="display:none;" class="mt-3 pop text-xs font-extrabold text-red-700 bg-red-100 px-4 py-2 rounded-lg border border-red-300 text-center"></p>
+            </div>
+
+            <!-- Aturan Main -->
+            <div class="bg-slate-100 border border-slate-300 rounded-xl p-4 mb-6 text-xs md:text-sm text-slate-700 font-bold space-y-1.5">
+                <div class="font-extrabold text-slate-900 flex items-center gap-2 mb-2 text-sm">
+                    <span class="text-lg">📌</span> Aturan Main Sosiologi:
+                </div>
+                <div class="flex items-start gap-2"><span class="mt-0.5">1.</span> <span>Masing-masing kelompok menguasai satu pohon pinang (Kiri & Kanan).</span></div>
+                <div class="flex items-start gap-2"><span class="mt-0.5">2.</span> <span>Terdapat <b>18 Soal Acak</b>. Waktu menjawab <b>20 detik</b> per soal setelah narator selesai.</span></div>
+                <div class="flex items-start gap-2"><span class="mt-0.5">3.</span> <span><b>Benar</b> = Naik <b>+1 langkah</b> (10 poin). <b>Salah / Waktu Habis</b> = Melorot <b>-1 langkah</b>. Target 5 Langkah menuju puncak!</span></div>
+            </div>
+
+            <!-- Tombol Mulai -->
+            <button type="button" id="btn-mulai-game" class="btn-3d w-full fun-font text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-red-600 via-red-500 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white py-4 px-6 rounded-2xl shadow-lg flex items-center justify-center gap-3 border-2 border-white">
+                <span class="animate-bounce">🚀</span> MULAI PERTANDINGAN!
+            </button>
+
+            <!-- Status Antrean -->
+            <div class="mt-4 flex flex-wrap items-center justify-between text-[11px] md:text-xs font-bold text-slate-500 px-2">
+                <span id="info-antrean-start">Status Rekap: Siap</span>
+                <button type="button" id="btn-kirim-ulang-start" style="display:none;" class="text-red-600 hover:text-red-800 underline font-extrabold transition-colors">
+                    🔄 Kirim Ulang Antrean
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         2. LAYAR KUIS / ARENA PERTANDINGAN
+         ========================================== -->
+    <section class="layar p-2 md:p-4" id="layar-kuis">
+        <div class="w-full max-w-[1536px] mx-auto flex flex-col flex-1 gap-3">
+            
+            <!-- TOP BAR -->
+            <div class="theme-panel px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+                <div class="flex items-center gap-2">
+                    <span class="bg-red-600 text-white font-extrabold text-xs md:text-sm px-3.5 py-1.5 rounded-full shadow-sm">
+                        Soal <span id="teks-no-soal">1</span> / <span id="teks-total-soal">18</span>
+                    </span>
+                    <span id="badge-kelas-main" class="bg-slate-800 text-white font-extrabold text-xs md:text-sm px-3 py-1.5 rounded-full shadow-sm">
+                        Kelas 10-2
+                    </span>
+                    <span class="hidden sm:inline-block text-xs font-extrabold text-slate-500 bg-slate-100 px-2 py-1 rounded-md border border-slate-200">
+                        ⚠️ Keluar Tab: <b id="teks-keluar-tab" class="text-red-600">0</b>
+                    </span>
+                </div>
+
+                <!-- Timer Tengah -->
+                <div id="wadah-timer" class="flex items-center gap-2 bg-amber-100 border-2 border-amber-400 px-4 py-1.5 rounded-full shadow-inner transition-colors duration-300">
+                    <span class="text-lg md:text-xl">⏱️</span>
+                    <span id="teks-status-fase" class="text-xs md:text-sm font-extrabold text-amber-900 uppercase">Bersiap...</span>
+                    <span id="teks-timer" class="fun-font text-2xl md:text-3xl font-extrabold text-red-700 min-w-[3rem] text-center tracking-wide">20s</span>
+                </div>
+
+                <!-- Kontrol Suara & Keluar -->
+                <div class="flex items-center gap-2">
+                    <button type="button" id="btn-dengarkan-lagi" class="btn-3d bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold px-3 py-2 rounded-lg" title="Baca Ulang Soal">
+                        🔊 <span class="hidden sm:inline">Baca Soal</span>
+                    </button>
+                    <button type="button" id="btn-toggle-narator-kuis" class="btn-3d bg-red-600 hover:bg-red-700 text-white text-xs font-extrabold px-3 py-2 rounded-lg" title="Toggle Narator">
+                        🗣️ <span class="hidden lg:inline label-narator">ON</span>
+                    </button>
+                    <button type="button" id="btn-toggle-sfx-kuis" class="btn-3d bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold px-3 py-2 rounded-lg" title="Toggle SFX">
+                        🔔 <span class="hidden lg:inline label-sfx">ON</span>
+                    </button>
+                    <button type="button" id="btn-fullscreen-kuis" class="btn-3d bg-purple-600 hover:bg-purple-700 text-white text-xs font-extrabold px-3 py-2 rounded-lg" title="Layar Penuh">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                    <button type="button" id="btn-keluar-menu" class="btn-3d bg-slate-700 hover:bg-slate-800 text-white text-xs font-extrabold px-3 py-2 rounded-lg">
+                        🏠 <span class="hidden sm:inline">Menu</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- BANNER FASE NARASI / HITUNG MUNDUR -->
+            <div id="panel-fase-tunggu" style="display:none;" class="bg-amber-100 border-2 border-amber-400 rounded-2xl px-4 py-3 flex flex-wrap items-center justify-center gap-4 shadow-md pop">
+                <span id="teks-info-tunggu" class="font-extrabold text-amber-950 text-sm md:text-base animate-pulse">
+                    🗣️ Narator sedang membacakan soal... Bersiap!
+                </span>
+                <button type="button" id="btn-lewati-narasi" class="btn-3d bg-amber-500 hover:bg-amber-600 text-white text-xs md:text-sm font-extrabold px-4 py-2 rounded-xl shadow-sm">
+                    ⏭️ Lewati Narasi
+                </button>
+            </div>
+
+            <!-- ARENA UTAMA (3 KOLOM: PANEL KIRI, POHON TENGAH, PANEL KANAN) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 items-stretch">
+                
+                <!-- PANEL TENGAH: 2 POHON PINANG -->
+                <div class="order-1 lg:order-2 lg:col-span-4 theme-panel p-4 flex flex-col justify-between bg-gradient-to-b from-sky-200 via-sky-100 to-emerald-100 border-4 border-white relative overflow-hidden min-h-[350px] lg:min-h-[500px]">
+                    
+                    <div class="text-center z-10">
+                        <div class="inline-block bg-white/95 border-2 border-red-400 px-4 py-1.5 rounded-full text-xs md:text-sm font-extrabold text-red-700 shadow-sm">
+                            🎋 ARENA POHON PINANG (5 LANGKAH) 🎋
+                        </div>
+                    </div>
+
+                    <div class="relative flex-1 flex items-end justify-around px-4 pt-10 pb-4 my-2">
+                        
+                        <!-- Garis Pembatas Langkah -->
+                        <div class="absolute inset-x-4 bottom-8 top-10 flex flex-col justify-between pointer-events-none z-0">
+                            <div class="border-b-2 border-dashed border-amber-500 text-[10px] md:text-xs font-extrabold text-amber-900 text-center bg-amber-100/70 rounded py-0.5">🏆 PUNCAK HADIAH (5)</div>
+                            <div class="border-b border-dashed border-slate-400 text-[10px] font-bold text-slate-600 text-center">Langkah 4</div>
+                            <div class="border-b border-dashed border-slate-400 text-[10px] font-bold text-slate-600 text-center">Langkah 3</div>
+                            <div class="border-b border-dashed border-slate-400 text-[10px] font-bold text-slate-600 text-center">Langkah 2</div>
+                            <div class="border-b border-dashed border-slate-400 text-[10px] font-bold text-slate-600 text-center">Langkah 1</div>
+                            <div class="border-b-2 border-emerald-700 text-[10px] md:text-xs font-extrabold text-emerald-950 text-center bg-emerald-100/50 rounded py-0.5">🌱 DASAR POHON (0)</div>
+                        </div>
+
+                        <!-- Pohon Pinang Kiri: Kelompok 1 -->
+                        <div class="relative h-full w-[30%] min-w-[70px] max-w-[100px] flex flex-col items-center justify-end z-10">
+                            <div id="label-tiang-merah" class="bg-red-600 text-white text-[10px] md:text-xs font-extrabold px-2.5 py-1 rounded-full shadow mb-2 truncate max-w-full w-full text-center">
+                                Kelompok 1
+                            </div>
+                            <div class="text-3xl md:text-4xl -mb-1.5 z-20 drop-shadow-md select-none">🌴🚲🎁</div>
+                            <div class="tiang-batang w-7 md:w-8 h-[220px] lg:h-[350px] rounded-t-lg relative">
+                                <div id="climber-merah" class="pemanjat-transisi absolute -left-6 md:-left-5 w-20 flex flex-col items-center" style="bottom: 0%;">
+                                    <div class="bg-red-600 text-white text-[10px] md:text-xs font-extrabold px-2 py-0.5 rounded-full shadow-md border-2 border-white whitespace-nowrap">
+                                        🔴 <span id="step-label-merah">0/5</span>
+                                    </div>
+                                    <div class="text-3xl md:text-4xl drop-shadow-lg select-none">🧗‍♂️</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pohon Pinang Kanan: Kelompok 2 -->
+                        <div class="relative h-full w-[30%] min-w-[70px] max-w-[100px] flex flex-col items-center justify-end z-10">
+                            <div id="label-tiang-biru" class="bg-blue-600 text-white text-[10px] md:text-xs font-extrabold px-2.5 py-1 rounded-full shadow mb-2 truncate max-w-full w-full text-center">
+                                Kelompok 2
+                            </div>
+                            <div class="text-3xl md:text-4xl -mb-1.5 z-20 drop-shadow-md select-none">🌴🎁🏆</div>
+                            <div class="tiang-batang w-7 md:w-8 h-[220px] lg:h-[350px] rounded-t-lg relative">
+                                <div id="climber-biru" class="pemanjat-transisi absolute -left-6 md:-left-5 w-20 flex flex-col items-center" style="bottom: 0%;">
+                                    <div class="bg-blue-600 text-white text-[10px] md:text-xs font-extrabold px-2 py-0.5 rounded-full shadow-md border-2 border-white whitespace-nowrap">
+                                        🔵 <span id="step-label-biru">0/5</span>
+                                    </div>
+                                    <div class="text-3xl md:text-4xl drop-shadow-lg select-none">🧗</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-emerald-700 text-white text-xs font-extrabold py-2 px-3 rounded-xl text-center shadow-inner z-10">
+                        🌱 Benar = Naik +1 Langkah | Salah = Melorot -1 Langkah 🌱
+                    </div>
+                </div>
+
+                <!-- PANEL KIRI: KELOMPOK 1 (SOAL & ILUSTRASI VISUAL BERGAMBAR) -->
+                <div id="panel-regu-merah" class="order-2 lg:order-1 lg:col-span-4 theme-panel p-4 flex flex-col justify-between border-4 border-red-500 bg-gradient-to-b from-red-50 to-white shadow-lg">
+                    <div>
+                        <div class="flex items-center justify-between bg-red-600 text-white px-4 py-2.5 rounded-xl shadow-md mb-3">
+                            <div class="flex items-center gap-2 truncate pr-2">
+                                <span class="text-xl">🔴</span>
+                                <span id="nama-tampil-merah" class="fun-font font-extrabold text-base md:text-xl truncate drop-shadow-sm">Kelompok 1</span>
+                            </div>
+                            <div class="flex flex-col items-end gap-1 shrink-0">
+                                <span class="bg-white text-red-800 font-extrabold text-xs px-2.5 py-0.5 rounded-md shadow-sm">
+                                    Skor: <b id="skor-merah" class="text-sm">0</b>
+                                </span>
+                                <span class="bg-red-900 text-yellow-300 font-extrabold text-[10px] px-2 py-0.5 rounded-md">
+                                    🎋 Langkah <b id="tingkat-merah">0</b>/5
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- KOTAK SOAL & GAMBAR VISUAL KIRI -->
+                        <div class="bg-white border-2 border-red-200 rounded-xl p-3.5 mb-3 shadow-sm text-left">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="bg-red-100 text-red-800 text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase border border-red-200">
+                                    📋 Soal Kelompok 1
+                                </span>
+                                <span class="text-xs font-extrabold text-slate-400">
+                                     #<span class="no-soal-regu">1</span>
+                                </span>
+                            </div>
+                            <!-- Wadah Gambar Visual Interaktif -->
+                            <div id="visual-img-merah" class="visual-img-container shadow-sm" style="display:none;"></div>
+                            <p id="teks-soal-merah" class="font-extrabold text-slate-800 leading-relaxed" style="font-size: clamp(0.95rem, 1.5vw, 1.15rem);">
+                                Memuat soal...
+                            </p>
+                        </div>
+
+                        <div id="status-jawab-merah" class="text-center text-xs md:text-sm font-extrabold py-2 px-3 rounded-xl bg-red-50 text-red-800 mb-3 border border-red-100 transition-colors">
+                            ⏳ Menunggu persiapan...
+                        </div>
+
+                        <div id="wadah-opsi-merah" class="grid grid-cols-1 gap-2.5"></div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t-2 border-red-100 text-xs font-bold text-slate-400 text-center flex flex-col gap-1">
+                        <span>Sentuh layar atau gunakan keyboard</span>
+                        <span class="text-slate-600"><b>[A]</b> - <b>[S]</b> - <b>[D]</b> - <b>[F]</b></span>
+                    </div>
+                </div>
+
+                <!-- PANEL KANAN: KELOMPOK 2 (SOAL & ILUSTRASI VISUAL BERGAMBAR) -->
+                <div id="panel-regu-biru" class="order-3 lg:order-3 lg:col-span-4 theme-panel p-4 flex flex-col justify-between border-4 border-blue-500 bg-gradient-to-b from-blue-50 to-white shadow-lg">
+                    <div>
+                        <div class="flex items-center justify-between bg-blue-600 text-white px-4 py-2.5 rounded-xl shadow-md mb-3">
+                            <div class="flex items-center gap-2 truncate pr-2">
+                                <span class="text-xl">🔵</span>
+                                <span id="nama-tampil-biru" class="fun-font font-extrabold text-base md:text-xl truncate drop-shadow-sm">Kelompok 2</span>
+                            </div>
+                            <div class="flex flex-col items-end gap-1 shrink-0">
+                                <span class="bg-white text-blue-800 font-extrabold text-xs px-2.5 py-0.5 rounded-md shadow-sm">
+                                    Skor: <b id="skor-biru" class="text-sm">0</b>
+                                </span>
+                                <span class="bg-blue-900 text-yellow-300 font-extrabold text-[10px] px-2 py-0.5 rounded-md">
+                                    🎋 Langkah <b id="tingkat-biru">0</b>/5
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- KOTAK SOAL & GAMBAR VISUAL KANAN -->
+                        <div class="bg-white border-2 border-blue-200 rounded-xl p-3.5 mb-3 shadow-sm text-left">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="bg-blue-100 text-blue-800 text-[10px] font-extrabold px-2.5 py-1 rounded-full uppercase border border-blue-200">
+                                    📋 Soal Kelompok 2
+                                </span>
+                                <span class="text-xs font-extrabold text-slate-400">
+                                    #<span class="no-soal-regu">1</span>
+                                </span>
+                            </div>
+                            <!-- Wadah Gambar Visual Interaktif -->
+                            <div id="visual-img-biru" class="visual-img-container shadow-sm" style="display:none;"></div>
+                            <p id="teks-soal-biru" class="font-extrabold text-slate-800 leading-relaxed" style="font-size: clamp(0.95rem, 1.5vw, 1.15rem);">
+                                Memuat soal...
+                            </p>
+                        </div>
+
+                        <div id="status-jawab-biru" class="text-center text-xs md:text-sm font-extrabold py-2 px-3 rounded-xl bg-blue-50 text-blue-800 mb-3 border border-blue-100 transition-colors">
+                            ⏳ Menunggu persiapan...
+                        </div>
+
+                        <div id="wadah-opsi-biru" class="grid grid-cols-1 gap-2.5"></div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t-2 border-blue-100 text-xs font-bold text-slate-400 text-center flex flex-col gap-1">
+                        <span>Sentuh layar atau gunakan keyboard</span>
+                        <span class="text-slate-600"><b>[J]</b> - <b>[K]</b> - <b>[L]</b> - <b>[;]</b></span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         3. LAYAR HASIL PERTANDINGAN
+         ========================================== -->
+    <section class="layar items-center justify-center p-4 md:p-6" id="layar-hasil">
+        <div class="w-full max-w-2xl theme-panel p-6 md:p-8 my-auto text-center">
+            
+            <div id="ikon-pemenang" class="pop text-7xl md:text-8xl mb-3 drop-shadow-md">🏆🎉</div>
+            <div class="inline-block bg-red-100 text-red-800 border-2 border-red-300 px-4 py-1 rounded-full text-xs md:text-sm font-extrabold mb-2">
+                HASIL AKHIR PERTANDINGAN — <span id="hasil-nama-kelas">Kelas 10-2</span>
+            </div>
+            <h2 id="judul-pemenang" class="fun-font text-3xl md:text-4xl font-extrabold text-red-700 leading-tight">
+                 KELOMPOK 1 MENANG!
+            </h2>
+            <p id="subjudul-pemenang" class="text-sm md:text-base font-bold text-slate-600 mt-2 mb-6">
+                Berhasil mencapai puncak pohon pinang lebih dulu!
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 text-left">
+                <div class="bg-red-50 border-4 border-red-400 rounded-2xl p-5 relative shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-extrabold text-red-900 text-base">🔴 <span id="hasil-nama-merah" class="truncate">Kelompok 1</span></span>
+                        <span id="badge-status-merah" class="bg-red-600 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-full">MENANG</span>
+                    </div>
+                    <div class="fun-font text-4xl font-extrabold text-red-700 my-2 drop-shadow-sm">
+                        Skor: <span id="hasil-skor-merah">0</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-700 space-y-1 mt-3">
+                        <div class="flex justify-between border-b border-red-200 pb-1"><span>Posisi Pinang:</span> <b id="hasil-langkah-merah" class="text-red-800">0 / 5 Langkah</b></div>
+                        <div class="flex justify-between pt-1"><span>Jawaban Benar:</span> <b id="hasil-benar-merah" class="text-emerald-700">0 soal</b></div>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 border-4 border-blue-400 rounded-2xl p-5 relative shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-extrabold text-blue-900 text-base">🔵 <span id="hasil-nama-biru" class="truncate">Kelompok 2</span></span>
+                        <span id="badge-status-biru" class="bg-blue-600 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-full">RUNNER-UP</span>
+                    </div>
+                    <div class="fun-font text-4xl font-extrabold text-blue-700 my-2 drop-shadow-sm">
+                        Skor: <span id="hasil-skor-biru">0</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-700 space-y-1 mt-3">
+                        <div class="flex justify-between border-b border-blue-200 pb-1"><span>Posisi Pinang:</span> <b id="hasil-langkah-biru" class="text-blue-800">0 / 5 Langkah</b></div>
+                        <div class="flex justify-between pt-1"><span>Jawaban Benar:</span> <b id="hasil-benar-biru" class="text-emerald-700">0 soal</b></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-amber-50 border-2 border-amber-300 rounded-2xl p-4 mb-5 text-left text-sm shadow-sm">
+                <div class="font-extrabold text-amber-950 mb-2 flex flex-wrap items-center justify-between gap-2 border-b border-amber-200 pb-2">
+                    <span class="text-base">📚 Evaluasi Penguasaan Materi:</span>
+                    <span class="text-xs font-bold text-slate-600 bg-white px-2 py-1 rounded shadow-sm">⏱️ <b id="hasil-durasi">00:00</b> | ⚠️ Tab: <b id="hasil-keluar-tab" class="text-red-600">0</b></span>
+                </div>
+                <p id="saran-konsep" class="font-bold text-amber-900 leading-relaxed mt-2">
+                    Kedua kelompok telah memahami konsep Tipe-Tipe Kelompok Sosial dengan sangat baik!
+                </p>
+            </div>
+
+            <div class="bg-slate-50 border-2 border-slate-200 rounded-xl p-4 mb-6 flex flex-wrap items-center justify-between gap-3 shadow-inner">
+                <div class="text-left">
+                    <div class="text-xs font-extrabold text-slate-800 flex items-center gap-2 mb-1">
+                        <span class="text-lg">☁️</span> Status Rekap Nilai:
+                        <span id="status-simpan-teks" class="px-3 py-1 rounded-full bg-amber-200 text-amber-900 border border-amber-300">Menyimpan…</span>
+                    </div>
+                    <div id="status-simpan-detail" class="text-xs font-bold text-slate-500">
+                        Menyimpan hasil kedua kelompok ke sistem...
+                    </div>
+                </div>
+                <button type="button" id="btn-kirim-ulang-hasil" style="display:none;" class="btn-3d bg-amber-500 hover:bg-amber-600 text-white text-xs font-extrabold px-4 py-2 rounded-xl shadow-sm">
+                    🔄 Kirim Ulang
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <button type="button" id="btn-buka-review" class="btn-3d bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold py-3.5 px-4 rounded-xl text-sm flex items-center justify-center gap-2">
+                    <span>📖</span> Pembahasan
+                </button>
+                <button type="button" id="btn-main-lagi" class="btn-3d bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3.5 px-4 rounded-xl text-sm flex items-center justify-center gap-2">
+                    <span>🔄</span> Main Lagi
+                </button>
+                <button type="button" id="btn-hasil-ke-menu" class="btn-3d bg-slate-700 hover:bg-slate-800 text-white font-extrabold py-3.5 px-4 rounded-xl text-sm flex items-center justify-center gap-2">
+                    <span>🏠</span> Ke Menu Utama
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         OVERLAY 1: FEEDBACK RONDE
+         ========================================== -->
+    <div class="overlay" id="overlay-feedback">
+        <div class="w-full max-w-lg theme-panel p-6 text-center pop shadow-2xl">
+            <div id="fb-judul" class="fun-font text-2xl md:text-3xl font-extrabold text-slate-900 mb-4 border-b-2 border-slate-100 pb-2">
+                Hasil Ronde Soal #1
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                <div id="fb-kartu-merah" class="p-3.5 rounded-xl border-2 text-sm font-extrabold shadow-sm flex flex-col justify-center min-h-[80px]">
+                    🔴 Kelompok 1: Benar (+1 Langkah)
+                </div>
+                <div id="fb-kartu-biru" class="p-3.5 rounded-xl border-2 text-sm font-extrabold shadow-sm flex flex-col justify-center min-h-[80px]">
+                    🔵 Kelompok 2: Salah (-1 Langkah)
+                </div>
+            </div>
+
+            <div class="bg-emerald-50 border-2 border-emerald-300 rounded-xl p-4 text-left mb-5 shadow-sm">
+                <div class="text-xs font-extrabold text-emerald-900 uppercase mb-2 flex items-center gap-1.5 border-b border-emerald-200 pb-1.5">
+                    <span>✅</span> Kunci Jawaban Benar:
+                </div>
+                <div id="fb-kunci-teks" class="text-sm font-extrabold text-emerald-950 mb-2"></div>
+                <p id="fb-penjelasan-teks" class="text-xs md:text-sm font-bold text-emerald-800/80 leading-relaxed"></p>
+            </div>
+
+            <button type="button" id="btn-soal-berikutnya" class="btn-3d w-full fun-font text-xl font-extrabold bg-red-600 hover:bg-red-700 text-white py-3.5 px-6 rounded-xl shadow-lg">
+                Lanjut Soal Berikutnya →
+            </button>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         OVERLAY 2: REVIEW JAWABAN
+         ========================================== -->
+    <div class="overlay" id="overlay-review">
+        <div class="w-full max-w-3xl theme-panel p-5 md:p-6 flex flex-col h-[90dvh] shadow-2xl">
+            <div class="flex items-center justify-between pb-4 mb-4 border-b-2 border-slate-200 shrink-0">
+                <h3 class="fun-font text-xl md:text-2xl font-extrabold text-red-700 flex items-center gap-2">
+                    <span>📖</span> Pembahasan Kuis Sosiologi
+                </h3>
+                <button type="button" id="btn-tutup-review" class="btn-3d bg-slate-700 hover:bg-slate-800 text-white text-sm font-extrabold px-4 py-2 rounded-xl">
+                    ✕ Tutup
+                </button>
+            </div>
+            <div id="wadah-daftar-review" class="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar"></div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         OVERLAY 3: ANTI-CURANG
+         ========================================== -->
+    <div class="overlay" id="overlay-anticurang">
+        <div class="w-full max-w-md theme-panel p-8 text-center border-4 border-red-600 shake shadow-2xl bg-white">
+            <div class="text-7xl mb-4">🚨⚠️🚨</div>
+            <h3 class="fun-font text-2xl md:text-3xl font-extrabold text-red-700 mb-3 leading-tight">
+                PERINGATAN ANTI-CURANG!
+            </h3>
+            <p class="text-sm md:text-base font-bold text-slate-700 mb-4">
+                Terdeteksi Anda keluar dari layar pertandingan. Tindakan ini tercatat otomatis di laporan Dasbor Guru!
+            </p>
+            <div class="bg-red-50 border-2 border-red-200 text-red-900 font-extrabold text-sm py-3 px-4 rounded-xl mb-6 inline-block">
+                Total Pelanggaran (Keluar Tab): <span id="angka-anticurang-modal" class="text-lg text-red-600">1</span> kali
+            </div>
+            <button type="button" id="btn-tutup-anticurang" class="btn-3d w-full bg-red-600 hover:bg-red-700 text-white font-extrabold py-3.5 px-5 rounded-xl text-lg shadow-md">
+                Saya Mengerti & Kembali Bermain
+            </button>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         OVERLAY 4: DASBOR GURU
+         ========================================== -->
+    <div class="overlay" id="overlay-dasbor">
+        <div class="theme-panel p-5 md:p-6 flex flex-col w-full shadow-2xl" style="max-width: 1024px; height: 92dvh;">
+            
+            <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-4 border-b-2 border-slate-200 shrink-0">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-2 md:gap-4">
+                    <h3 class="fun-font text-xl md:text-2xl font-extrabold text-red-700 flex items-center gap-2">
+                        <span>📊</span> Dasbor Rekap Nilai
+                    </h3>
+                    <span id="badge-koneksi-server" class="text-[11px] md:text-xs font-extrabold px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-300 w-max">
+                        Server: Mengecek...
+                    </span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" id="btn-refresh-dasbor" style="display:none;" class="btn-3d bg-blue-600 hover:bg-blue-700 text-white text-xs md:text-sm font-extrabold px-3.5 py-2 rounded-xl">
+                        🔄 Segarkan
+                    </button>
+                    <button type="button" id="btn-tutup-dasbor" class="btn-3d bg-slate-800 hover:bg-slate-900 text-white text-xs md:text-sm font-extrabold px-4 py-2 rounded-xl">
+                        ✕ Tutup
+                    </button>
+                </div>
+            </div>
+
+            <!-- LOGIN PIN -->
+            <div id="panel-login-pin" class="my-auto py-8 max-w-sm mx-auto w-full text-center pop">
+                <div class="text-6xl mb-4 drop-shadow-md">🔐</div>
+                <h4 class="fun-font text-2xl font-extrabold text-slate-800 mb-2">Akses Dasbor Guru</h4>
+                <p class="text-sm font-bold text-slate-500 mb-5">
+                    Gunakan PIN: <span class="bg-amber-100 text-amber-900 px-2 py-0.5 rounded font-extrabold border border-amber-300">2026</span>
+                </p>
+                <input type="password" id="input-pin-dasbor" maxlength="12" placeholder="Ketik PIN di sini..."
+                    class="w-full px-5 py-3.5 rounded-xl border-2 border-slate-300 text-center font-extrabold text-xl tracking-[0.3em] mb-3 focus:outline-none focus:border-red-600 transition-colors shadow-inner">
+                <p id="pesan-error-pin" style="display:none;" class="text-sm font-extrabold text-red-600 mb-3 bg-red-50 py-1.5 rounded-lg border border-red-200"></p>
+                <button type="button" id="btn-masuk-dasbor" class="btn-3d w-full bg-red-600 hover:bg-red-700 text-white font-extrabold py-3.5 rounded-xl text-base shadow-md">
+                    🔓 Buka Rekap Nilai
+                </button>
+            </div>
+
+            <!-- KONTEN DASBOR -->
+            <div id="panel-isi-dasbor" style="display:none;" class="flex-1 flex flex-col overflow-hidden pop">
+                <div class="shrink-0 space-y-3 mb-4">
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="bg-gradient-to-br from-red-50 to-white border-2 border-red-200 rounded-xl p-3 text-center shadow-sm">
+                            <div class="text-[10px] md:text-xs font-extrabold text-red-800 uppercase mb-1">Total Kelompok</div>
+                            <div id="stat-total" class="fun-font text-2xl md:text-3xl font-extrabold text-red-700 leading-none">0</div>
+                        </div>
+                        <div class="bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 rounded-xl p-3 text-center shadow-sm">
+                            <div class="text-[10px] md:text-xs font-extrabold text-blue-800 uppercase mb-1">Rata-Rata Skor</div>
+                            <div id="stat-rata" class="fun-font text-2xl md:text-3xl font-extrabold text-blue-700 leading-none">0</div>
+                        </div>
+                        <div class="bg-gradient-to-br from-emerald-50 to-white border-2 border-emerald-200 rounded-xl p-3 text-center shadow-sm">
+                            <div class="text-[10px] md:text-xs font-extrabold text-emerald-800 uppercase mb-1">Skor Tertinggi</div>
+                            <div id="stat-tinggi" class="fun-font text-2xl md:text-3xl font-extrabold text-emerald-700 leading-none">0</div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row gap-3">
+                        <div class="flex-1 flex flex-col sm:flex-row gap-2">
+                            <input type="text" id="input-cari-rekap" placeholder="🔍 Cari nama / kelas..."
+                                class="flex-1 px-4 py-2 rounded-xl border-2 border-slate-300 text-sm font-bold focus:outline-none focus:border-red-500 transition-colors">
+                            <select id="filter-kelas-rekap" class="px-4 py-2 rounded-xl border-2 border-slate-300 text-sm font-extrabold bg-white focus:outline-none focus:border-red-500">
+                                <option value="SEMUA">🏫 Semua Kelas</option>
+                                <option value="10-1">🏫 Kelas 10-1</option>
+                                <option value="10-2">🏫 Kelas 10-2</option>
+                                <option value="10-3">🏫 Kelas 10-3</option>
+                                <option value="10-4">🏫 Kelas 10-4</option>
+                                <option value="10-5">🏫 Kelas 10-5</option>
+                                <option value="10-6">🏫 Kelas 10-6</option>
+                                <option value="10-7">🏫 Kelas 10-7</option>
+                            </select>
+                            <select id="urutkan-rekap" class="px-4 py-2 rounded-xl border-2 border-slate-300 text-sm font-extrabold bg-white focus:outline-none focus:border-red-500">
+                                <option value="TERBARU">🕒 Terbaru</option>
+                                <option value="SKOR_TINGGI">🏆 Skor Tertinggi</option>
+                                <option value="NAMA_AZ">🔤 Nama A-Z</option>
+                            </select>
+                        </div>
+                        <div class="flex gap-2 shrink-0">
+                            <button type="button" id="btn-unduh-excel" class="btn-3d bg-emerald-600 hover:bg-emerald-700 text-white text-xs md:text-sm font-extrabold py-2 px-3 rounded-xl flex items-center justify-center gap-1.5" title="Unduh CSV">
+                                <span>📗</span> <span class="hidden lg:inline">Excel</span>
+                            </button>
+                            <button type="button" id="btn-unduh-pdf" class="btn-3d bg-red-600 hover:bg-red-700 text-white text-xs md:text-sm font-extrabold py-2 px-3 rounded-xl flex items-center justify-center gap-1.5" title="Unduh PDF">
+                                <span>📕</span> <span class="hidden lg:inline">PDF</span>
+                            </button>
+                            <button type="button" id="btn-unduh-word" class="btn-3d bg-blue-600 hover:bg-blue-700 text-white text-xs md:text-sm font-extrabold py-2 px-3 rounded-xl flex items-center justify-center gap-1.5" title="Unduh Word">
+                                <span>📘</span> <span class="hidden lg:inline">Word</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-y-auto border-2 border-slate-200 rounded-xl bg-slate-50 shadow-inner relative">
+                    <table class="w-full text-left border-collapse tabel-rekap">
+                        <thead class="sticky top-0 bg-slate-800 text-white text-xs md:text-sm font-extrabold z-10 shadow-sm">
+                            <tr>
+                                <th class="p-3 rounded-tl-lg">Waktu</th>
+                                <th class="p-3">Kelompok</th>
+                                <th class="p-3">Kelas</th>
+                                <th class="p-3 text-center">Skor</th>
+                                <th class="p-3 text-center">Benar</th>
+                                <th class="p-3 text-center hidden md:table-cell">Durasi</th>
+                                <th class="p-3 text-center" title="Keluar Tab">⚠️ Tab</th>
+                                <th class="p-3 text-center hidden xl:table-cell">Main Ke</th>
+                                <th class="p-3 rounded-tr-lg">Detail Pertandingan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-rekap" class="text-xs md:text-sm font-bold text-slate-700 divide-y divide-slate-200"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AREA CETAK TERSEMBUNYI -->
+    <div id="areaCetak"></div>
+
+    <!-- ==========================================
+         SCRIPT UTAMA APLIKASI
+         ========================================== -->
+    <script>
+        window.addEventListener('error', function (e) {
+            const pita = document.getElementById('pita-error');
+            if (pita) {
+                pita.style.display = 'block';
+                pita.textContent = 'Galat Teknis: ' + (e.message || 'Terjadi kesalahan skrip');
+            }
+        });
+
+        const INFO_APP = {
+            judul: 'Panjat Pinang Sosiologi',
+            subjudul: 'Tipe-Tipe Kelompok Sosial',
+            instansi: 'SMA Negeri 1 Tambakboyo - Tuban',
+            pembuat: 'Boedi Darmawan, S.Sos',
+            pinDefault: '2026',
+            kkm: 70,
+            langkahPuncak: 5,
+            jumlahSoalPerMain: 18,
+            detikPerSoal: 20
+        };
+
+        const KEY_PROGRES = 'progres_panjat_pinang_sosiologi_v5';
+        const KEY_ANTREAN = 'antrian_simpan_panjat_pinang_v5';
+        const KEY_MOCK_DATA = 'mock_rekap_panjat_pinang_v5';
+
+        const ADA_GAS = typeof google !== 'undefined' && google.script && google.script.run;
+
+        // ==========================================
+        // BANK SOAL SOSIOLOGI (25 SOAL TERBARU SESUAI REVISI DOKUMEN)
+        // ==========================================
+        const BANK_SOAL = [
+            // 6 SOAL DENGAN ILUSTRASI SVG ASLI
+            {
+                q: "Perhatikan ilustrasi silsilah keluarga inti di atas. Bentuk kelompok sosial apakah struktur tersebut menurut F. Tonnies ?",
+                svg: '<img src="https://drive.google.com/thumbnail?id=1IZcb-ij75ayzKHpsV1s1fhNRpjCAXS2w&sz=w1000" style="width:100%; height:100%; object-fit:contain; border-radius:8px;" alt="Silsilah Keluarga" onerror="this.onerror=null; this.src=\'https://placehold.co/600x400/f8fafc/dc2626?text=Gambar+Diblokir+Google+Drive\'">',
+                opsi: ["Paguyuban (Gemeinschaft)", "Patembayan (Gesellschaft)", "Kelompok Sekunder", "Kelompok Sosial"],
+                benar: 0,
+                jelas: "Keluarga merupakan contoh utama Paguyuban (Gemeinschaft) karena anggotanya memiliki hubungan batin yang kuat, bersifat alamiah, dan kekal."
+            },
+            {
+                q: "Perhatikan skema bentuk solidaritas sosial di atas. Ciri utama dari tipe solidaritas pada skema di atas adalah...",
+                svg: '<img src="https://drive.google.com/thumbnail?id=1GrPu1TxWISzuvyda7HbWfNY4DDLfx1rV&sz=w1000" style="width:100%; height:100%; object-fit:contain; border-radius:8px;" alt="Solidaritas" onerror="this.onerror=null; this.src=\'https://placehold.co/600x400/f8fafc/dc2626?text=Gambar+Diblokir+Google+Drive\'">',
+                opsi: ["Solidaritas mekanik (Durkheim)", "Solidaritas organik (Durkheim)", "Patembayan (Gesellschaft)", "Kelompok Masyarakat"],
+                benar: 0,
+                jelas: "Skema tersebut menggambarkan solidaritas mekanik menurut Emile Durkheim yang menjadi ciri masyarakat sederhana dengan kesadaran kolektif yang kuat."
+            },
+            {
+                q: "Perhatikan ilustrasi interaksi dua kelompok di atas. Ketika kelompok dalam (in-group) berinteraksi dengan kelompok luar (out-group), gejala sosial apakah yang sering muncul ?",
+                svg: '<img src="https://drive.google.com/thumbnail?id=1uRFsPKfjE_iVRC2tCwdkAkwinvs-lZR3&sz=w1000" style="width:100%; height:100%; object-fit:contain; border-radius:8px;" alt="Interaksi Kelompok" onerror="this.onerror=null; this.src=\'https://placehold.co/600x400/f8fafc/dc2626?text=Gambar+Diblokir+Google+Drive\'">',
+                opsi: ["Etnosentrisme dan potensi konflik", "Solidaritas organik murni tanpa gesekan", "Pembentukan asosiasi formal negara", "Asimilasi kebudayaan baru"],
+                benar: 0,
+                jelas: "Menurut W.G. Sumner, kuatnya in-group feeling sering memicu etnosentrisme dan permusuhan (out-group hostility) antar-sekolah."
+            },
+            {
+                q: "Perhatikan karakteristik hubungan dalam organisasi berikut. Berdasarkan skema di atas, bentuk kelompok apakah yang sedang digambarkan?",
+                svg: '<img src="https://drive.google.com/thumbnail?id=1bbZgaVP22hbN3PUObQQ9TCEiEyuMlSQj&sz=w1000" style="width:100%; height:100%; object-fit:contain; border-radius:8px;" alt="Karakteristik Organisasi" onerror="this.onerror=null; this.src=\'https://placehold.co/600x400/f8fafc/dc2626?text=Gambar+Diblokir+Google+Drive\'">',
+                opsi: ["Patembayan (Gesellschaft)", "Paguyuban (Gemeinschaft)", "Kelompok Sosial", "Komunitas Karyawan"],
+                benar: 0,
+                jelas: "Ciri ikatan lahir, berbasis kontrak rasional, bersifat sementara, dan hubungan antarperan adalah karakteristik patembayan (gesellschaft)."
+            },
+            {
+                q: "Perhatikan ilustrasi kerumunan sosial di atas. Termasuk ke dalam bentuk kerumunan apakah orang-orang yang mengantre di loket ?",
+                svg: '<img src="https://drive.google.com/thumbnail?id=1NdvD1vcYxZ--Ovp-rNJByq5pR3i6FVLc&sz=w1000" style="width:100%; height:100%; object-fit:contain; border-radius:8px;" alt="Kerumunan Sosial" onerror="this.onerror=null; this.src=\'https://placehold.co/600x400/f8fafc/dc2626?text=Gambar+Diblokir+Google+Drive\'">',
+                opsi: ["Inconvenient aggregations (Causal crowds)", "Formal audiences (Penonton formal)", "Acting mobs (Kerumunan emosional)", "Planned expressive group"],
+                benar: 0,
+                jelas: "Orang yang mengantre karcis atau menunggu bus termasuk inconvenient aggregations, di mana kehadiran orang lain menjadi penghalang tercapainya tujuan individu."
+            },
+            {
+                q: "Perhatikan skema kelompok acuan di atas. Seseorang yang bukan polisi namun meniru kedisiplinan dan sikap polisi menggunakan kelompok tersebut sebagai...",
+                svg: '<img src="https://drive.google.com/thumbnail?id=1UcfcW7jducQkEtu74Pt8vT6B9d_Zp0ek&sz=w1000" style="width:100%; height:100%; object-fit:contain; border-radius:8px;" alt="Kelompok Acuan" onerror="this.onerror=null; this.src=\'https://placehold.co/600x400/f8fafc/dc2626?text=Gambar+Diblokir+Google+Drive\'">',
+                opsi: ["Reference group", "Membership group", "Kelompok statistik murni", "Kelompok statistik Formal"],
+                benar: 0,
+                jelas: "Reference group adalah kelompok sosial yang menjadi acuan bagi seseorang bukan anggota untuk membentuk pribadi dan perilakunya."
+            },
+            // 19 SOAL STANDAR TAMBAHAN
+            {
+                q: "Menurut Emile Durkheim, masyarakat yang masih sederhana, belum mengenal pembagian kerja, dan mengutamakan persamaan perilaku diikat oleh...",
+                opsi: ["Solidaritas mekanik", "Solidaritas organik", "Solidaritas murni", "Solidaritas sosial"],
+                benar: 0,
+                jelas: "Dalam klasifikasi Emile Durkheim, solidaritas mekanik merupakan ciri masyarakat sederhana yang belum mengenal pembagian kerja dan diikat oleh kesadaran kolektif."
+            },
+            {
+                q: "Sanksi terhadap pelanggaran kesepakatan bersama pada masyarakat dengan solidaritas organik bersifat restitutif, yang artinya...",
+                opsi: [
+                    "Pelanggar harus membayar ganti rugi untuk mengembalikan keseimbangan",
+                    "Pelanggar dijatuhi hukuman pidana penjara untuk menjadikan pelajaran bagi yang lain",
+                    "Pelanggar dikucilkan selamanya dari desa adat dan boleh kembali setelah sadar",
+                    "Pelanggar dihukum fisik di hadapan seluruh warga adat untuk di jadikan contoh"
+                ],
+                benar: 0,
+                jelas: "Pada masyarakat solidaritas organik, hukum yang menonjol adalah hukum perdata dengan sanksi restitutif, yaitu membayar ganti rugi kepada pihak yang dirugikan."
+            },
+            {
+                q: "Ferdinand Tonnies membagi kelompok menjadi paguyuban (gemeinschaft) dan patembayan (gesellschaft). Berikut yang merupakan tiga ciri paguyuban adalah...",
+                opsi: [
+                    "Intim, privat, dan eksklusif",
+                    "Formal, rasional, dan terbuka",
+                    "Sementara, mekanis, dan public life",
+                    "Kontraktual, renggang, dan heterogen"
+                ],
+                benar: 0,
+                jelas: "Menurut Ferdinand Tonnies, paguyuban memiliki tiga ciri utama: intim (hubungan menyeluruh mendalam), privat (pribadi), dan eksklusif (hanya untuk kelompoknya sendiri)."
+            },
+            {
+                q: "Rukun Tetangga (RT) dan Rukun Warga (RW) yang terbentuk karena anggotanya bertempat tinggal berdekatan sehingga dapat saling menolong termasuk tipe paguyuban...",
+                opsi: [
+                    "Gemeinschaft of place",
+                    "Gemeinschaft by blood",
+                    "Gemeinschaft of mind",
+                    "Gesellschaft by location"
+                ],
+                benar: 0,
+                jelas: "RT dan RW adalah contoh gemeinschaft of place, yaitu paguyuban yang terdiri atas orang-orang yang berdekatan tempat tinggalnya."
+            },
+            {
+                q: "Hubungan dalam dunia industri atau organisasi politik yang bersifat sementara, mengutamakan perjanjian/kontrak rasional, dan strukturnya mekanis disebut...",
+                opsi: ["Patembayan", "Paguyuban", "Kelompok primer", "In-group"],
+                benar: 0,
+                jelas: "Patembayan (gesellschaft) merupakan bentuk kehidupan bersama dengan ikatan lahir yang bersifat pokok dalam jangka waktu relatif pendek dan berbasis kontrak."
+            },
+            {
+                q: "Menurut Charles Horton Cooley, kelompok primer dikenal sebagai face to face group. Berikut ini yang merupakan tiga syarat kelompok primer adalah...",
+                opsi: [
+                    "Anggota berdekatan secara fisik, kelompok kecil, dan hubungan langgeng",
+                    "Anggota berjumlah besar, diikat kontrak kerja, dan bersifat sementara",
+                    "Hubungan formal, tidak saling mengenal, dan bertujuan dalam bidang ekonomi",
+                    "Tersebar di berbagai kota, komunikasi via media massa, dan anonim"
+                ],
+                benar: 0,
+                jelas: "Syarat kelompok primer menurut Cooley adalah anggota secara fisik berdekatan, merupakan kelompok kecil, dan adanya kelanggengan hubungan."
+            },
+            {
+                q: "Ellsworth Farris mengkritik Cooley dengan menjelaskan adanya kelompok sekunder. Contoh kelompok sekunder yang berciri formal, tidak pribadi, dan kelembagaan adalah...",
+                opsi: [
+                    "Koperasi, yayasan, dan Persatuan Guru Republik Indonesia",
+                    "Keluarga inti dan teman sepermainan di masa kecil",
+                    "Kelompok kerabat paling dekat dan sahabat karib",
+                    "Kelompok rukun warga dan kelompok diskusi sahabat"
+                ],
+                benar: 0,
+                jelas: "Sekolah, yayasan, koperasi, dan PGRI adalah contoh kelompok sekunder karena anggotanya banyak, formal, dan berkumpul berdasarkan kepentingan tertentu."
+            },
+            {
+                q: "Robert K. Merton membedakan derajat interaksi dalam membership group menjadi dua, yaitu anggota yang dianggap sudah tidak berhubungan lagi sehingga kelompok tidak punya kekuasaan atasnya yang disebut...",
+                opsi: [
+                    "Peripheral group member",
+                    "Nominal group member",
+                    "Reference group tipe normatif",
+                    "Vested interest group"
+                ],
+                benar: 0,
+                jelas: "Anggota periferal grup dianggap sudah tidak berhubungan lagi dengan kelompoknya, sedangkan anggota nominal grup masih berinteraksi meskipun tidak intens."
+            },
+            {
+                q: "Herbert G. Hicks mengemukakan alasan orang memilih berorganisasi (formal group). Berikut yang termasuk alasan materi (material reason) adalah...",
+                opsi: [
+                    "Memperbesar kemampuan, menghemat waktu, dan menarik manfaat pengetahuan generasi sebelumnya",
+                    "Menghilangkan identitas pribadi agar bebas dari tanggung jawab sosial secara pribadi di masyarakat",
+                    "Mencari penyaluran ketegangan emosional secara spontan di jalan raya",
+                    "Menghindari peraturan tertulis dan tidak tertulis agar tidak lagi terikat dengan pembagian kerja"
+                ],
+                benar: 0,
+                jelas: "Melalui organisasi (alasan materi), manusia dapat memperbesar kemampuannya, menghemat waktu mencapai sasaran, dan menarik manfaat pengetahuan yang terhimpun."
+            },
+            {
+                q: "Menurut klasifikasi Robert Bierstedt, kelompok penduduk usia 10–15 tahun di sebuah kecamatan yang dikelompokkan oleh ahli statistik termasuk...",
+                opsi: [
+                    "Kelompok statistik",
+                    "Kelompok masyarakat",
+                    "Kelompok sosial",
+                    "Kelompok asosiasi"
+                ],
+                benar: 0,
+                jelas: "Kelompok statistik adalah kelompok yang bukan organisasi, tidak memiliki hubungan sosial, dan tidak memiliki kesadaran jenis yang sama di antara anggotanya."
+            },
+            {
+                q: "Tokoh sosiologi yang mendefinisikan kota sebagai tempat yang penduduknya dapat memenuhi sebagian besar kebutuhan ekonominya di pasar lokal adalah...",
+                opsi: ["Max Weber", "Wright", "Harris dan Ullman", "Phillips Ruop"],
+                benar: 0,
+                jelas: "Menurut Max Weber, suatu tempat disebut kota apabila penduduk atau masyarakatnya dapat memenuhi sebagian besar kebutuhan ekonominya di pasar lokal."
+            },
+            {
+                q: "Masyarakat Cibaduyut di Kota Bandung yang hampir seluruh warganya berprofesi sebagai perajin sepatu (home industry) merupakan contoh dari...",
+                opsi: [
+                    "Komunitas ekonomi",
+                    "Komunitas perajin",
+                    "Komunitas karyawan",
+                    "Komunitas fungsional"
+                ],
+                benar: 0,
+                jelas: "Komunitas ekonomi adalah bentuk hidup bersama yang sebagian besar kegiatan penduduknya berorientasi di bidang ekonomi, seperti perajin sepatu Cibaduyut."
+            },
+            {
+                q: "Memudarnya fungsi kelompok kekerabatan dan berkembangnya spesialisasi pekerjaan yang dipelajari secara ilmiah melahirkan kelompok orang-orang dengan pekerjaan sejenis yang disebut...",
+                opsi: [
+                    "Kelompok okupasional",
+                    "Kelompok volunter",
+                    "Kelompok kekerabatan tradisional",
+                    "Causal crowds"
+                ],
+                benar: 0,
+                jelas: "Kelompok okupasional terdiri atas orang-orang yang melakukan pekerjaan sejenis akibat spesialisasi pembagian kerja dalam masyarakat yang heterogen."
+            },
+            {
+                q: "Kelompok yang mencakup orang-orang dengan kepentingan sama namun tidak mendapat perhatian masyarakat luas, sehingga dibentuk untuk memenuhi kepentingan anggotanya tanpa mengganggu masyarakat umum disebut...",
+                opsi: [
+                    "Kelompok volunter",
+                    "Kelompok okupasional",
+                    "Kelompok statistik",
+                    "Kelompok Vested interest"
+                ],
+                benar: 0,
+                jelas: "Kelompok volunter muncul karena tidak semua kepentingan individual (primer maupun sekunder) warga masyarakat dapat dipenuhi secara mantap oleh masyarakat luas."
+            },
+            {
+                q: "Orang-orang yang menghadiri ceramah agama/khotbah atau menonton film di bioskop mempunyai pusat perhatian dan tujuan yang sama tetapi bersifat pasif. Kerumunan ini disebut...",
+                opsi: [
+                    "Formal audiences ",
+                    "Planned expressive group",
+                    "Spectator crowds",
+                    "Inconvenient aggregations"
+                ],
+                benar: 0,
+                jelas: "Formal audiences adalah kerumunan yang berartikulasi dengan struktur sosial, memiliki pusat perhatian dan persamaan tujuan, tetapi bersifat pasif."
+            },
+            {
+                q: "Kerumunan orang yang sedang berpesta untuk menyalurkan ketegangan akibat pekerjaan sehari-hari, di mana pusat perhatiannya tidak begitu penting tetapi tujuannya kepuasan aktivitas, disebut...",
+                opsi: [
+                    "Planned expressive group",
+                    "Panic crowds",
+                    "Acting mobs",
+                    "Formal audiences"
+                ],
+                benar: 0,
+                jelas: "Planned expressive group adalah kelompok ekspresif yang direncanakan sebagai penyalur ketegangan sehari-hari, contohnya orang yang berpesta."
+            },
+            {
+                q: "Kerumunan yang bertindak emosional menggunakan kekuatan fisik yang berlawanan dengan norma masyarakat karena merasa hak-haknya diinjak atau adanya ketidakadilan disebut...",
+                opsi: [
+                    "Acting mobs",
+                    "Immoral crowds",
+                    "Residential aggregate",
+                    "Action mobs"
+                ],
+                benar: 0,
+                jelas: "Acting mobs termasuk lawless crowds (berlawanan dengan norma hukum) yang bergerak secara emosional menggunakan kekuatan fisik karena merasa diperlakukan tidak adil."
+            },
+            {
+                q: "Dalam keanggotaan suatu publik, sekumpulan orang yang telah memiliki kedudukan tertentu dalam masyarakat dan ingin mempertahankan keadaan yang sudah ada (bersifat pro) disebut...",
+                opsi: [
+                    "Kelompok vested interest",
+                    "Kelompok new comer",
+                    "Kelompok immoral crowds",
+                    "Kelompok massa abstrak"
+                ],
+                benar: 0,
+                jelas: "Kelompok vested interest adalah kelompok dalam publik yang sudah memiliki kedudukan tertentu dan ingin mempertahankan status quo sehingga bersifat pro."
+            },
+            {
+                q: "Perbedaan mendasar antara kerumunan (crowd) dan publik dalam kelompok sosial tidak teratur adalah...",
+                opsi: [
+                    "Publik berinteraksi secara tidak langsung melalui media massa dan cenderung berpikir rasional",
+                    "Publik selalu berkumpul secara fisik di satu lapangan yang sama secara kebetulan",
+                    "Kerumunan selalu diikat oleh anggaran dasar organisasi tertulis yang permanen, tetap, dan langgeng",
+                    "Anggota kerumunan lebih mementingkan pertimbangan rasional dibanding emosi kelompok"
+                ],
+                benar: 0,
+                jelas: "Publik bukan kesatuan fisik di satu tempat; interaksinya tidak langsung lewat media massa (surat kabar, radio, TV) dan anggotanya masih cenderung berpikir rasional."
+            }
+        ];
+
+        // ==========================================
+        // PENYIMPANAN LOKAL AMAN
+        // ==========================================
+        const memoriLokal = {};
+        function bacaStorage(kunci, nilaiDefault) {
+            try {
+                const mentah = window.localStorage.getItem(kunci);
+                if (!mentah) return nilaiDefault;
+                return JSON.parse(mentah);
+            } catch (e) {
+                return memoriLokal[kunci] !== undefined ? memoriLokal[kunci] : nilaiDefault;
+            }
+        }
+        function tulisStorage(kunci, nilai) {
+            try {
+                memoriLokal[kunci] = nilai;
+                window.localStorage.setItem(kunci, JSON.stringify(nilai));
+            } catch (e) {
+                memoriLokal[kunci] = nilai;
+            }
+        }
+        function hapusStorage(kunci) {
+            try {
+                delete memoriLokal[kunci];
+                window.localStorage.removeItem(kunci);
+            } catch (e) {}
+        }
+
+        // ==========================================
+        // MANAJER SUARA
+        // ==========================================
+        let AC = null;
+        let masterGain = null;
+        let naratorAktif = true;
+        let sfxAktif = true;
+        let idSuara = 0;
+        let sedangNarasi = false;
+        let osilatorAktif = [];
+        let timerSirine = null;
+
+        function bukaAudio() {
+            try {
+                if (!AC) {
+                    AC = new (window.AudioContext || window.webkitAudioContext)();
+                    masterGain = AC.createGain();
+                    masterGain.gain.value = 0.5;
+                    const kompresor = AC.createDynamicsCompressor();
+                    const gema = AC.createDelay();
+                    gema.delayTime.value = 0.16;
+                    const umpan = AC.createGain();
+                    umpan.gain.value = 0.25;
+                    masterGain.connect(kompresor);
+                    masterGain.connect(gema);
+                    gema.connect(umpan);
+                    umpan.connect(gema);
+                    umpan.connect(kompresor);
+                    kompresor.connect(AC.destination);
+                }
+                if (AC.state !== 'running') {
+                    AC.resume();
+                }
+            } catch (e) {}
+        }
+
+        function hentikanSemuaSuara() {
+            idSuara++;
+            sedangNarasi = false;
+            try {
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                }
+            } catch (e) {}
+            try {
+                if (timerSirine) {
+                    clearTimeout(timerSirine);
+                    timerSirine = null;
+                }
+                while (osilatorAktif.length > 0) {
+                    const osc = osilatorAktif.pop();
+                    try { osc.stop(); osc.disconnect(); } catch (e) {}
+                }
+            } catch (e) {}
+        }
+
+        function nada(frek, mulai, dur, vol) {
+            try {
+                if (!AC || !sfxAktif) return;
+                if (sedangNarasi || ('speechSynthesis' in window && window.speechSynthesis.speaking)) return;
+                const t0 = AC.currentTime + mulai;
+                [[frek, 'sine', 1], [frek * 2, 'triangle', 0.25]].forEach(function (p) {
+                    const o = AC.createOscillator();
+                    const g = AC.createGain();
+                    o.type = p[1];
+                    o.frequency.value = p[0];
+                    g.gain.setValueAtTime(0.0001, t0);
+                    g.gain.linearRampToValueAtTime((vol || 0.15) * p[2], t0 + 0.01);
+                    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+                    o.connect(g);
+                    g.connect(masterGain);
+                    osilatorAktif.push(o);
+                    o.start(t0);
+                    o.stop(t0 + dur + 0.05);
+                });
+            } catch (e) {}
+        }
+
+        function sfxKlik() { nada(880, 0, 0.06, 0.08); }
+        function sfxBenar() { [523.25, 659.25, 783.99, 1046.5].forEach(function (f, i) { nada(f, i * 0.09, 0.28, 0.16); }); }
+        function sfxSalah() { nada(392, 0, 0.25, 0.14); nada(311.13, 0.18, 0.3, 0.14); }
+        function sfxTik() { nada(1000, 0, 0.04, 0.09); }
+        function sfxSelesai(lulus) {
+            if (lulus) {
+                [523.25, 659.25, 783.99, 659.25, 783.99, 1046.5].forEach(function (f, i) {
+                    nada(f, i * 0.11, 0.32, 0.18);
+                });
+            } else {
+                [440, 392, 329.63, 293.66].forEach(function (f, i) {
+                    nada(f, i * 0.14, 0.3, 0.15);
+                });
+            }
+        }
+
+        function bunyikanSirine() {
+            try {
+                bukaAudio();
+                hentikanSemuaSuara();
+                if (!AC) return;
+                const t0 = AC.currentTime;
+                const osc = AC.createOscillator();
+                const filter = AC.createBiquadFilter();
+                const gain = AC.createGain();
+
+                osc.type = 'sawtooth';
+                filter.type = 'lowpass';
+                filter.frequency.value = 1800;
+                gain.gain.value = 0.25;
+
+                osc.frequency.setValueAtTime(600, t0);
+                for (let i = 0; i < 6; i++) {
+                    const naik = i % 2 === 0 ? 1000 : 600;
+                    osc.frequency.linearRampToValueAtTime(naik, t0 + (i + 1) * 0.33);
+                }
+
+                osc.connect(filter);
+                filter.connect(gain);
+                gain.connect(masterGain);
+                osilatorAktif.push(osc);
+                osc.start(t0);
+                osc.stop(t0 + 2.0);
+            } catch (e) {}
+        }
+
+        function bacakanTeks(teks, bahasa, saatSelesai) {
+            hentikanSemuaSuara(); // Memanggil window.speechSynthesis.cancel() di dalamnya
+            
+            const tiketSuara = idSuara;
+            if (!naratorAktif || !('speechSynthesis' in window)) {
+                if (typeof saatSelesai === 'function') saatSelesai();
+                return;
+            }
+
+            try {
+                sedangNarasi = true;
+                const ucap = new SpeechSynthesisUtterance(teks);
+                ucap.lang = bahasa || 'id-ID';
+                ucap.rate = 1.0;
+                ucap.pitch = 1.0;
+
+                let sudahPanggil = false;
+                function akhiri() {
+                    if (sudahPanggil) return;
+                    sudahPanggil = true;
+                    if (tiketSuara !== idSuara) return;
+                    sedangNarasi = false;
+                    if (typeof saatSelesai === 'function') saatSelesai();
+                }
+
+                ucap.onend = akhiri;
+                ucap.onerror = akhiri;
+                
+                // Fallback timeout just in case onend never fires (mobile bug)
+                setTimeout(() => {
+                    if(sedangNarasi && tiketSuara === idSuara) {
+                        akhiri();
+                    }
+                }, Math.max(5000, teks.length * 100)); // Rough estimate based on char length
+
+                window.speechSynthesis.speak(ucap);
+            } catch (e) {
+                sedangNarasi = false;
+                if (typeof saatSelesai === 'function') saatSelesai();
+            }
+        }
+
+        function perbaruiLabelSuaraUI() {
+            document.querySelectorAll('.label-narator').forEach(function (el) {
+                el.textContent = 'ON';
+                if(!naratorAktif) el.textContent = 'OFF';
+                el.parentElement.style.opacity = naratorAktif ? '1' : '0.6';
+            });
+            document.querySelectorAll('.label-sfx').forEach(function (el) {
+                el.textContent = 'ON';
+                if(!sfxAktif) el.textContent = 'OFF';
+                el.parentElement.style.opacity = sfxAktif ? '1' : '0.6';
+            });
+        }
+
+        // ==========================================
+        // LAYAR PENUH (FULLSCREEN)
+        // ==========================================
+        function toggleFullScreen() {
+            if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+                // Masuk mode layar penuh
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen();
+                } else if (document.documentElement.msRequestFullscreen) {
+                    document.documentElement.msRequestFullscreen();
+                } else if (document.documentElement.mozRequestFullScreen) {
+                    document.documentElement.mozRequestFullScreen();
+                } else if (document.documentElement.webkitRequestFullscreen) {
+                    document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+                }
+            } else {
+                // Keluar dari mode layar penuh
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
+            }
+        }
+
+        // ==========================================
+        // NAVIGASI LAYAR
+        // ==========================================
+        function tampilLayar(id) {
+            const daftar = document.querySelectorAll('.layar');
+            for (let i = 0; i < daftar.length; i++) {
+                daftar[i].classList.remove('aktif');
+            }
+            const target = document.getElementById(id);
+            if (target) {
+                target.classList.add('aktif');
+            }
+            window.scrollTo(0, 0);
+        }
+
+        function tampilOverlay(id, buka) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            if (buka) {
+                el.classList.add('tampil');
+            } else {
+                el.classList.remove('tampil');
+            }
+        }
+
+        // ==========================================
+        // STATE PERTANDINGAN
+        // ==========================================
+        let kuisBerjalan = false;
+        let stateKuis = null;
+        let intervalTimerSoal = null;
+        let intervalHitungMundur = null;
+        let intervalSimpanPeriodik = null;
+
+        function acakArray(arr) {
+            const salinan = arr.slice();
+            for (let i = salinan.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                const tmp = salinan[i];
+                salinan[i] = salinan[j];
+                salinan[j] = tmp;
+            }
+            return salinan;
+        }
+
+        function buatIdUnik(awalan) {
+            return (awalan || 'SESI') + '_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8).toUpperCase();
+        }
+
+        function siapkanPaketSoalAcak() {
+            const indeksAcak = acakArray(BANK_SOAL.map(function (_, idx) { return idx; }))
+                .slice(0, INFO_APP.jumlahSoalPerMain);
+
+            return indeksAcak.map(function (idxAsli) {
+                const item = BANK_SOAL[idxAsli];
+                const pasanganOpsi = item.opsi.map(function (teks, i) {
+                    return { teks: teks, adalahBenar: i === item.benar };
+                });
+                const opsiDiacak = acakArray(pasanganOpsi);
+                let indeksBenarBaru = 0;
+                opsiDiacak.forEach(function (op, idx) {
+                    if (op.adalahBenar) indeksBenarBaru = idx;
+                });
+                return {
+                    idxAsli: idxAsli,
+                    q: item.q,
+                    svg: item.svg || '',
+                    opsi: opsiDiacak.map(function (o) { return o.teks; }),
+                    benar: indeksBenarBaru,
+                    jelas: item.jelas
+                };
+            });
+        }
+
+        function simpanProgresSesi() {
+            if (!stateKuis || !kuisBerjalan) return;
+            tulisStorage(KEY_PROGRES, stateKuis);
+        }
+
+        function hapusProgresSesi() {
+            hapusStorage(KEY_PROGRES);
+        }
+
+        function cekKartuLanjutkanDiStart() {
+            const tersimpan = bacaStorage(KEY_PROGRES, null);
+            const kartu = document.getElementById('kartu-lanjutkan');
+            const info = document.getElementById('info-lanjutkan');
+            if (!tersimpan || !tersimpan.daftarSoal || tersimpan.selesai) {
+                kartu.style.display = 'none';
+                return;
+            }
+            kartu.style.display = 'block';
+            const noSoal = (tersimpan.indeksSoal || 0) + 1;
+            const totSoal = tersimpan.daftarSoal.length;
+            info.textContent = tersimpan.reguMerah.nama + ' (' + tersimpan.reguMerah.langkah + '/5) vs ' +
+                tersimpan.reguBiru.nama + ' (' + tersimpan.reguBiru.langkah + '/5) — Kelas ' +
+                tersimpan.kelas + ' (Soal ' + noSoal + ' dari ' + totSoal + ')';
+        }
+
+        function ambilKelasTerpilih() {
+            const sel = document.getElementById('select-kelas').value;
+            if (sel === 'LAINNYA') {
+                return document.getElementById('input-kelas-lainnya').value.trim();
+            }
+            return sel.trim();
+        }
+
+        function tampilkanPesanValidasi(teks) {
+            const el = document.getElementById('pesan-validasi-start');
+            if (!teks) {
+                el.style.display = 'none';
+                el.textContent = '';
+            } else {
+                el.style.display = 'block';
+                el.textContent = teks;
+            }
+        }
+
+        function mulaiKuis() {
+            bukaAudio();
+            sfxKlik();
+            hentikanSemuaSuara();
+
+            const namaMerah = document.getElementById('input-regu-merah').value.trim();
+            const namaBiru = document.getElementById('input-regu-biru').value.trim();
+            const kelas = ambilKelasTerpilih();
+
+            if (!namaMerah || !namaBiru) {
+                tampilkanPesanValidasi('⚠️ Nama Kelompok 1 dan Kelompok 2 wajib diisi!');
+                return;
+            }
+            if (!kelas) {
+                tampilkanPesanValidasi('⚠️ Silakan pilih atau ketik kelas terlebih dahulu!');
+                return;
+            }
+            tampilkanPesanValidasi('');
+
+            const paketSoal = siapkanPaketSoalAcak();
+            const idPertandingan = buatIdUnik('MATCH');
+
+            stateKuis = {
+                idPertandingan: idPertandingan,
+                idSesiMerah: idPertandingan + '_KELOMPOK1',
+                idSesiBiru: idPertandingan + '_KELOMPOK2',
+                kelas: kelas,
+                waktuMulaiMs: Date.now(),
+                waktuSelesaiMutlak: Date.now() + (INFO_APP.detikPerSoal * 1000),
+                indeksSoal: 0,
+                daftarSoal: paketSoal,
+                keluarTab: 0,
+                selesai: false,
+                reguMerah: {
+                    nama: namaMerah,
+                    skor: 0,
+                    benar: 0,
+                    langkah: 0,
+                    pilihanSekarang: null
+                },
+                reguBiru: {
+                    nama: namaBiru,
+                    skor: 0,
+                    benar: 0,
+                    langkah: 0,
+                    pilihanSekarang: null
+                },
+                riwayatRonde: []
+            };
+
+            aktifkanLayarPertandingan();
+        }
+
+        function lanjutkanKuisTersimpan() {
+            bukaAudio();
+            sfxKlik();
+            hentikanSemuaSuara();
+            const tersimpan = bacaStorage(KEY_PROGRES, null);
+            if (!tersimpan || !tersimpan.daftarSoal) return;
+
+            stateKuis = tersimpan;
+            stateKuis.reguMerah.pilihanSekarang = null;
+            stateKuis.reguBiru.pilihanSekarang = null;
+            aktifkanLayarPertandingan();
+        }
+
+        function aktifkanLayarPertandingan() {
+            kuisBerjalan = true;
+            simpanProgresSesi();
+
+            if (intervalSimpanPeriodik) clearInterval(intervalSimpanPeriodik);
+            intervalSimpanPeriodik = setInterval(function () {
+                if (kuisBerjalan) simpanProgresSesi();
+            }, 5000);
+
+            tampilLayar('layar-kuis');
+            perbaruiHeaderArenaUI();
+            perbaruiPosisiTiangPinangUI();
+            tampilSoal();
+        }
+
+        function perbaruiHeaderArenaUI() {
+            if (!stateKuis) return;
+            document.getElementById('badge-kelas-main').textContent = 'Kelas ' + stateKuis.kelas;
+            document.getElementById('teks-keluar-tab').textContent = String(stateKuis.keluarTab || 0);
+            document.getElementById('nama-tampil-merah').textContent = stateKuis.reguMerah.nama;
+            document.getElementById('nama-tampil-biru').textContent = stateKuis.reguBiru.nama;
+            document.getElementById('label-tiang-merah').textContent = stateKuis.reguMerah.nama;
+            document.getElementById('label-tiang-biru').textContent = stateKuis.reguBiru.nama;
+            document.getElementById('skor-merah').textContent = String(stateKuis.reguMerah.skor);
+            document.getElementById('skor-biru').textContent = String(stateKuis.reguBiru.skor);
+            document.getElementById('tingkat-merah').textContent = String(stateKuis.reguMerah.langkah);
+            document.getElementById('tingkat-biru').textContent = String(stateKuis.reguBiru.langkah);
+        }
+
+        function perbaruiPosisiTiangPinangUI() {
+            if (!stateKuis) return;
+            const persenMerah = Math.min(100, Math.max(0, (stateKuis.reguMerah.langkah / INFO_APP.langkahPuncak) * 85));
+            const persenBiru = Math.min(100, Math.max(0, (stateKuis.reguBiru.langkah / INFO_APP.langkahPuncak) * 85));
+
+            const elMerah = document.getElementById('climber-merah');
+            const elBiru = document.getElementById('climber-biru');
+            if (elMerah) elMerah.style.bottom = persenMerah + '%';
+            if (elBiru) elBiru.style.bottom = persenBiru + '%';
+
+            document.getElementById('step-label-merah').textContent = stateKuis.reguMerah.langkah + '/' + INFO_APP.langkahPuncak;
+            document.getElementById('step-label-biru').textContent = stateKuis.reguBiru.langkah + '/' + INFO_APP.langkahPuncak;
+            document.getElementById('tingkat-merah').textContent = String(stateKuis.reguMerah.langkah);
+            document.getElementById('tingkat-biru').textContent = String(stateKuis.reguBiru.langkah);
+            document.getElementById('skor-merah').textContent = String(stateKuis.reguMerah.skor);
+            document.getElementById('skor-biru').textContent = String(stateKuis.reguBiru.skor);
+        }
+
+        let faseInputDibuka = false;
+
+        function bersihkanTimerRonde() {
+            if (intervalTimerSoal) {
+                clearInterval(intervalTimerSoal);
+                intervalTimerSoal = null;
+            }
+            if (intervalHitungMundur) {
+                clearInterval(intervalHitungMundur);
+                intervalHitungMundur = null;
+            }
+            const wadahTimer = document.getElementById('wadah-timer');
+            if(wadahTimer) wadahTimer.classList.remove('pulse-danger');
+        }
+
+        function tampilSoal() {
+            if (!stateKuis) return;
+            hentikanSemuaSuara();
+            bersihkanTimerRonde();
+            faseInputDibuka = false;
+
+            const idx = stateKuis.indeksSoal;
+            const total = stateKuis.daftarSoal.length;
+            const soal = stateKuis.daftarSoal[idx];
+
+            stateKuis.reguMerah.pilihanSekarang = null;
+            stateKuis.reguBiru.pilihanSekarang = null;
+
+            document.getElementById('teks-no-soal').textContent = String(idx + 1);
+            document.getElementById('teks-total-soal').textContent = String(total);
+            document.querySelectorAll('.no-soal-regu').forEach(function (el) {
+                el.textContent = String(idx + 1);
+            });
+
+            document.getElementById('teks-soal-merah').textContent = soal.q;
+            document.getElementById('teks-soal-biru').textContent = soal.q;
+
+            const imgMerah = document.getElementById('visual-img-merah');
+            const imgBiru = document.getElementById('visual-img-biru');
+
+            if (soal.svg) {
+                imgMerah.style.display = 'flex';
+                imgMerah.innerHTML = soal.svg;
+                imgBiru.style.display = 'flex';
+                imgBiru.innerHTML = soal.svg;
+            } else {
+                imgMerah.style.display = 'none';
+                imgMerah.innerHTML = '';
+                imgBiru.style.display = 'none';
+                imgBiru.innerHTML = '';
+            }
+
+            document.getElementById('teks-timer').textContent = INFO_APP.detikPerSoal + 's';
+
+            renderTombolOpsiRegu('merah', soal.opsi, false);
+            renderTombolOpsiRegu('biru', soal.opsi, false);
+
+            const panelTunggu = document.getElementById('panel-fase-tunggu');
+            const teksTunggu = document.getElementById('teks-info-tunggu');
+            const btnLewati = document.getElementById('btn-lewati-narasi');
+
+            if (naratorAktif) {
+                panelTunggu.style.display = 'flex';
+                btnLewati.style.display = 'inline-block';
+                document.getElementById('teks-status-fase').textContent = 'Narator Membaca...';
+                teksTunggu.textContent = '🗣️ Dengarkan soal terlebih dahulu...';
+                setStatusRegu('merah', '⏳ Mendengarkan soal...', 'bg-amber-50 text-amber-900 border-amber-200');
+                setStatusRegu('biru', '⏳ Mendengarkan soal...', 'bg-amber-50 text-amber-900 border-amber-200');
+
+                bacakanTeks(soal.q, 'id-ID', function () {
+                    mulaiHitungMundurTigaDetik();
+                });
+            } else {
+                mulaiHitungMundurTigaDetik();
+            }
+        }
+
+        function mulaiHitungMundurTigaDetik() {
+            hentikanSemuaSuara();
+            bersihkanTimerRonde();
+
+            const panelTunggu = document.getElementById('panel-fase-tunggu');
+            const teksTunggu = document.getElementById('teks-info-tunggu');
+            const btnLewati = document.getElementById('btn-lewati-narasi');
+
+            panelTunggu.style.display = 'flex';
+            btnLewati.style.display = 'none';
+
+            let hitungan = 3;
+            document.getElementById('teks-status-fase').textContent = 'Bersiap: ' + hitungan;
+            teksTunggu.textContent = '⚡ Siap-siap jawab dalam: ' + hitungan + '...';
+            setStatusRegu('merah', '⚡ Bersiap dalam ' + hitungan + '...', 'bg-amber-100 text-amber-900 border-amber-300');
+            setStatusRegu('biru', '⚡ Bersiap dalam ' + hitungan + '...', 'bg-amber-100 text-amber-900 border-amber-300');
+            sfxTik();
+
+            intervalHitungMundur = setInterval(function () {
+                hitungan--;
+                if (hitungan > 0) {
+                    document.getElementById('teks-status-fase').textContent = 'Bersiap: ' + hitungan;
+                    teksTunggu.textContent = '⚡ Siap-siap jawab dalam: ' + hitungan + '...';
+                    setStatusRegu('merah', '⚡ Bersiap dalam ' + hitungan + '...', 'bg-amber-100 text-amber-900 border-amber-300');
+                    setStatusRegu('biru', '⚡ Bersiap dalam ' + hitungan + '...', 'bg-amber-100 text-amber-900 border-amber-300');
+                    sfxTik();
+                } else {
+                    clearInterval(intervalHitungMundur);
+                    intervalHitungMundur = null;
+                    panelTunggu.style.display = 'none';
+                    bukaInputDanMulaiTimerSoal();
+                }
+            }, 1000);
+        }
+
+        function bukaInputDanMulaiTimerSoal() {
+            if (!stateKuis) return;
+            const soal = stateKuis.daftarSoal[stateKuis.indeksSoal];
+            faseInputDibuka = true;
+
+            renderTombolOpsiRegu('merah', soal.opsi, true);
+            renderTombolOpsiRegu('biru', soal.opsi, true);
+
+            setStatusRegu('merah', '🔥 SILAKAN PILIH JAWABAN!', 'bg-red-100 text-red-900 border-red-300 pulse-danger');
+            setStatusRegu('biru', '🔥 SILAKAN PILIH JAWABAN!', 'bg-blue-100 text-blue-900 border-blue-300 pulse-danger');
+            document.getElementById('teks-status-fase').textContent = 'Sisa Waktu:';
+
+            stateKuis.waktuSelesaiMutlak = Date.now() + (INFO_APP.detikPerSoal * 1000);
+            simpanProgresSesi();
+            
+            const wadahTimer = document.getElementById('wadah-timer');
+
+            intervalTimerSoal = setInterval(function () {
+                const sisaMs = stateKuis.waktuSelesaiMutlak - Date.now();
+                const sisaDetik = Math.max(0, Math.ceil(sisaMs / 1000));
+                document.getElementById('teks-timer').textContent = sisaDetik + 's';
+
+                if (sisaDetik <= 5 && !wadahTimer.classList.contains('pulse-danger')) {
+                    wadahTimer.classList.add('pulse-danger');
+                    wadahTimer.classList.remove('bg-amber-100', 'border-amber-400');
+                    wadahTimer.classList.add('bg-red-200', 'border-red-500');
+                }
+
+                if (sisaDetik <= 10 && sisaDetik > 0) {
+                    sfxTik();
+                }
+                if (sisaDetik <= 0) {
+                    clearInterval(intervalTimerSoal);
+                    intervalTimerSoal = null;
+                    wadahTimer.classList.remove('pulse-danger', 'bg-red-200', 'border-red-500');
+                    wadahTimer.classList.add('bg-amber-100', 'border-amber-400');
+                    selesaikanRondeSoal();
+                }
+            }, 250);
+        }
+
+        function setStatusRegu(regu, teks, kelasWarna) {
+            const el = document.getElementById('status-jawab-' + regu);
+            if (!el) return;
+            el.className = 'text-center text-xs md:text-sm font-extrabold py-2 px-3 rounded-xl mb-3 border transition-all ' + kelasWarna;
+            el.textContent = teks;
+        }
+
+        function renderTombolOpsiRegu(regu, daftarOpsi, aktif) {
+            const wadah = document.getElementById('wadah-opsi-' + regu);
+            if (!wadah) return;
+            wadah.innerHTML = '';
+
+            const huruf = ['A', 'B', 'C', 'D'];
+            const tombolKey = regu === 'merah' ? ['A', 'S', 'D', 'F'] : ['J', 'K', 'L', ';'];
+            const warnaBadge = regu === 'merah' ? 'bg-red-600 text-white' : 'bg-blue-600 text-white';
+
+            daftarOpsi.forEach(function (teksOpsi, idx) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.disabled = !aktif;
+                btn.className = 'btn-answer w-full text-left p-3 rounded-xl bg-slate-50 hover:bg-white flex items-start gap-2.5 font-bold text-xs md:text-sm text-slate-800';
+
+                const badge = document.createElement('span');
+                badge.className = warnaBadge + ' font-extrabold text-[10px] md:text-[11px] px-2 py-0.5 rounded-md shrink-0 mt-0.5 shadow-sm';
+                badge.textContent = huruf[idx] + ' [' + tombolKey[idx] + ']';
+
+                const spanTeks = document.createElement('span');
+                spanTeks.className = 'flex-1 leading-snug';
+                spanTeks.textContent = teksOpsi;
+
+                btn.appendChild(badge);
+                btn.appendChild(spanTeks);
+
+                btn.addEventListener('pointerdown', function (ev) {
+                    ev.preventDefault(); // Mencegah double firing di touch devices
+                    pilihJawabanRegu(regu, idx);
+                });
+
+                wadah.appendChild(btn);
+            });
+        }
+
+        function pilihJawabanRegu(regu, indeksOpsi) {
+            if (!kuisBerjalan || !faseInputDibuka || !stateKuis) return;
+            const dataRegu = regu === 'merah' ? stateKuis.reguMerah : stateKuis.reguBiru;
+
+            if (dataRegu.pilihanSekarang !== null) return;
+
+            bukaAudio();
+            dataRegu.pilihanSekarang = indeksOpsi;
+            sfxKlik();
+
+            const wadah = document.getElementById('wadah-opsi-' + regu);
+            if (wadah) {
+                const tombol = wadah.querySelectorAll('button');
+                tombol.forEach(function (b, idx) {
+                    b.disabled = true;
+                    if (idx === indeksOpsi) {
+                        b.className = 'btn-answer w-full text-left p-3 rounded-xl flex items-start gap-2.5 font-extrabold text-xs md:text-sm shadow-md ' +
+                            (regu === 'merah' ? 'bg-red-100 border-red-500 text-red-950' : 'bg-blue-100 border-blue-500 text-blue-950');
+                    }
+                });
+            }
+
+            const huruf = ['A', 'B', 'C', 'D'][indeksOpsi];
+            setStatusRegu(regu, '🔒 Terkunci (' + huruf + ') — Menunggu...', 'bg-slate-200 text-slate-800 border-slate-400');
+
+            if (stateKuis.reguMerah.pilihanSekarang !== null && stateKuis.reguBiru.pilihanSekarang !== null) {
+                selesaikanRondeSoal();
+            }
+        }
+
+        function selesaikanRondeSoal() {
+            if (!stateKuis) return;
+            faseInputDibuka = false;
+            hentikanSemuaSuara();
+            bersihkanTimerRonde();
+
+            const idx = stateKuis.indeksSoal;
+            const soal = stateKuis.daftarSoal[idx];
+            const huruf = ['A', 'B', 'C', 'D'];
+
+            const pilMerah = stateKuis.reguMerah.pilihanSekarang;
+            const pilBiru = stateKuis.reguBiru.pilihanSekarang;
+
+            const merahBenar = pilMerah === soal.benar;
+            const biruBenar = pilBiru === soal.benar;
+
+            if (merahBenar) {
+                stateKuis.reguMerah.benar++;
+                stateKuis.reguMerah.skor += 10;
+                stateKuis.reguMerah.langkah = Math.min(INFO_APP.langkahPuncak, stateKuis.reguMerah.langkah + 1);
+            } else {
+                stateKuis.reguMerah.langkah = Math.max(0, stateKuis.reguMerah.langkah - 1);
+            }
+
+            if (biruBenar) {
+                stateKuis.reguBiru.benar++;
+                stateKuis.reguBiru.skor += 10;
+                stateKuis.reguBiru.langkah = Math.min(INFO_APP.langkahPuncak, stateKuis.reguBiru.langkah + 1);
+            } else {
+                stateKuis.reguBiru.langkah = Math.max(0, stateKuis.reguBiru.langkah - 1);
+            }
+
+            stateKuis.riwayatRonde.push({
+                nomor: idx + 1,
+                q: soal.q,
+                svg: soal.svg || '',
+                opsi: soal.opsi,
+                benar: soal.benar,
+                pilMerah: pilMerah,
+                pilBiru: pilBiru,
+                merahBenar: merahBenar,
+                biruBenar: biruBenar,
+                jelas: soal.jelas
+            });
+
+            perbaruiPosisiTiangPinangUI();
+            simpanProgresSesi();
+
+            if (merahBenar || biruBenar) {
+                sfxBenar();
+            } else {
+                sfxSalah();
+            }
+
+            document.getElementById('fb-judul').textContent = 'Hasil Ronde Soal #' + (idx + 1);
+
+            const elFbMerah = document.getElementById('fb-kartu-merah');
+            const teksPilMerah = pilMerah !== null ? ('Pilihan ' + huruf[pilMerah]) : 'Waktu Habis';
+            if (merahBenar) {
+                elFbMerah.className = 'p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 text-sm font-extrabold shadow-sm flex flex-col justify-center';
+                elFbMerah.innerHTML = '🔴 ' + stateKuis.reguMerah.nama + ':<br>BENAR! (' + teksPilMerah + ')<br>⬆️ Naik ke Langkah ' + stateKuis.reguMerah.langkah;
+            } else {
+                elFbMerah.className = 'p-3.5 rounded-xl border-2 border-rose-400 bg-rose-50 text-rose-900 text-sm font-extrabold shadow-sm flex flex-col justify-center';
+                elFbMerah.innerHTML = '🔴 ' + stateKuis.reguMerah.nama + ':<br>SALAH (' + teksPilMerah + ')<br>⬇️ Turun ke Langkah ' + stateKuis.reguMerah.langkah;
+            }
+
+            const elFbBiru = document.getElementById('fb-kartu-biru');
+            const teksPilBiru = pilBiru !== null ? ('Pilihan ' + huruf[pilBiru]) : 'Waktu Habis';
+            if (biruBenar) {
+                elFbBiru.className = 'p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-900 text-sm font-extrabold shadow-sm flex flex-col justify-center';
+                elFbBiru.innerHTML = '🔵 ' + stateKuis.reguBiru.nama + ':<br>BENAR! (' + teksPilBiru + ')<br>⬆️ Naik ke Langkah ' + stateKuis.reguBiru.langkah;
+            } else {
+                elFbBiru.className = 'p-3.5 rounded-xl border-2 border-rose-400 bg-rose-50 text-rose-900 text-sm font-extrabold shadow-sm flex flex-col justify-center';
+                elFbBiru.innerHTML = '🔵 ' + stateKuis.reguBiru.nama + ':<br>SALAH (' + teksPilBiru + ')<br>⬇️ Turun ke Langkah ' + stateKuis.reguBiru.langkah;
+            }
+
+            document.getElementById('fb-kunci-teks').textContent = huruf[soal.benar] + '. ' + soal.opsi[soal.benar];
+            document.getElementById('fb-penjelasan-teks').textContent = soal.jelas;
+
+            const adaPuncak = stateKuis.reguMerah.langkah >= INFO_APP.langkahPuncak || stateKuis.reguBiru.langkah >= INFO_APP.langkahPuncak;
+            const soalHabis = (idx + 1) >= stateKuis.daftarSoal.length;
+            const btnLanjut = document.getElementById('btn-soal-berikutnya');
+
+            if (adaPuncak || soalHabis) {
+                btnLanjut.innerHTML = '🏆 Lihat Pemenang & Hasil Akhir &rarr;';
+            } else {
+                btnLanjut.innerHTML = 'Lanjut Soal Berikutnya &rarr;';
+            }
+
+            tampilOverlay('overlay-feedback', true);
+        }
+
+        function lanjutKeSoalBerikutnya() {
+            bukaAudio();
+            sfxKlik();
+            hentikanSemuaSuara();
+            tampilOverlay('overlay-feedback', false);
+
+            if (!stateKuis) return;
+            const adaPuncak = stateKuis.reguMerah.langkah >= INFO_APP.langkahPuncak || stateKuis.reguBiru.langkah >= INFO_APP.langkahPuncak;
+            const soalHabis = (stateKuis.indeksSoal + 1) >= stateKuis.daftarSoal.length;
+
+            if (adaPuncak || soalHabis) {
+                akhiriPertandingan();
+            } else {
+                stateKuis.indeksSoal++;
+                simpanProgresSesi();
+                tampilSoal();
+            }
+        }
+
+        function formatDurasi(detikTotal) {
+            const m = Math.floor(detikTotal / 60);
+            const s = detikTotal % 60;
+            return (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s);
+        }
+
+        function akhiriPertandingan() {
+            hentikanSemuaSuara();
+            bersihkanTimerRonde();
+            kuisBerjalan = false;
+            if (intervalSimpanPeriodik) {
+                clearInterval(intervalSimpanPeriodik);
+                intervalSimpanPeriodik = null;
+            }
+
+            if (!stateKuis) return;
+            stateKuis.selesai = true;
+            hapusProgresSesi();
+
+            const durasiDetik = Math.max(1, Math.round((Date.now() - stateKuis.waktuMulaiMs) / 1000));
+            const soalTerjawab = stateKuis.riwayatRonde.length || INFO_APP.jumlahSoalPerMain;
+
+            const m = stateKuis.reguMerah;
+            const b = stateKuis.reguBiru;
+
+            let judul = '🤝 PERTANDINGAN SERI!';
+            let subjudul = 'Kedua kelompok di Kelas ' + stateKuis.kelas + ' sama kuat dalam memanjat pohon pinang!';
+            let statusMerah = 'SERI';
+            let statusBiru = 'SERI';
+
+            if (m.langkah > b.langkah || (m.langkah === b.langkah && m.skor > b.skor)) {
+                judul = '🏆 ' + m.nama.toUpperCase() + ' MENANG!';
+                subjudul = m.langkah >= INFO_APP.langkahPuncak
+                    ? 'Luar biasa! Berhasil mencapai Puncak (Langkah 5) dan meraih hadiah utama!'
+                    : 'Unggul memanjat lebih tinggi pada akhir pertandingan!';
+                statusMerah = 'MENANG 🏆';
+                statusBiru = 'KALAH';
+            } else if (b.langkah > m.langkah || (b.langkah === m.langkah && b.skor > m.skor)) {
+                judul = '🏆 ' + b.nama.toUpperCase() + ' MENANG!';
+                subjudul = b.langkah >= INFO_APP.langkahPuncak
+                    ? 'Luar biasa! Berhasil mencapai Puncak (Langkah 5) dan meraih hadiah utama!'
+                    : 'Unggul memanjat lebih tinggi pada akhir pertandingan!';
+                statusMerah = 'KALAH';
+                statusBiru = 'MENANG 🏆';
+            }
+
+            document.getElementById('hasil-nama-kelas').textContent = 'Kelas ' + stateKuis.kelas;
+            document.getElementById('judul-pemenang').textContent = judul;
+            document.getElementById('subjudul-pemenang').textContent = subjudul;
+
+            document.getElementById('hasil-nama-merah').textContent = m.nama;
+            document.getElementById('badge-status-merah').textContent = statusMerah;
+            document.getElementById('hasil-skor-merah').textContent = String(m.skor);
+            document.getElementById('hasil-langkah-merah').textContent = m.langkah + ' / ' + INFO_APP.langkahPuncak + ' Langkah';
+            document.getElementById('hasil-benar-merah').textContent = m.benar + ' dari ' + soalTerjawab + ' soal';
+
+            document.getElementById('hasil-nama-biru').textContent = b.nama;
+            document.getElementById('badge-status-biru').textContent = statusBiru;
+            document.getElementById('hasil-skor-biru').textContent = String(b.skor);
+            document.getElementById('hasil-langkah-biru').textContent = b.langkah + ' / ' + INFO_APP.langkahPuncak + ' Langkah';
+            document.getElementById('hasil-benar-biru').textContent = b.benar + ' dari ' + soalTerjawab + ' soal';
+
+            document.getElementById('hasil-durasi').textContent = formatDurasi(durasiDetik);
+            document.getElementById('hasil-keluar-tab').textContent = String(stateKuis.keluarTab || 0);
+
+            const rataSkor = Math.round((m.skor + b.skor) / 2);
+            const elSaran = document.getElementById('saran-konsep');
+            if (rataSkor >= INFO_APP.kkm) {
+                elSaran.textContent = '🌟 Sangat Baik! Kedua kelompok di Kelas ' + stateKuis.kelas + ' telah menguasai klasifikasi Kelompok Sosial Teratur (Durkheim, Tonnies, dll) dan Tidak Teratur.';
+            } else {
+                elSaran.textContent = '💡 Saran Belajar: Pelajari kembali perbedaan Paguyuban vs Patembayan, dan jenis-jenis Kerumunan. Klik "Pembahasan" di bawah untuk *review*.';
+            }
+
+            tampilLayar('layar-hasil');
+            sfxSelesai(rataSkor >= INFO_APP.kkm);
+
+            const barisMerah = {
+                idSesi: stateKuis.idSesiMerah,
+                nama: m.nama,
+                kelas: stateKuis.kelas,
+                skor: m.skor,
+                benar: m.benar,
+                total: soalTerjawab,
+                durasiDetik: durasiDetik,
+                keluarTab: stateKuis.keluarTab || 0,
+                ekstra: JSON.stringify({
+                    lawan: b.nama,
+                    hasil: statusMerah,
+                    langkah: m.langkah + '/' + INFO_APP.langkahPuncak,
+                    skorLawan: b.skor
+                })
+            };
+
+            const barisBiru = {
+                idSesi: stateKuis.idSesiBiru,
+                nama: b.nama,
+                kelas: stateKuis.kelas,
+                skor: b.skor,
+                benar: b.benar,
+                total: soalTerjawab,
+                durasiDetik: durasiDetik,
+                keluarTab: stateKuis.keluarTab || 0,
+                ekstra: JSON.stringify({
+                    lawan: m.nama,
+                    hasil: statusBiru,
+                    langkah: b.langkah + '/' + INFO_APP.langkahPuncak,
+                    skorLawan: m.skor
+                })
+            };
+
+            masukkanKeAntreanDanKirim([barisMerah, barisBiru]);
+        }
+
+        function bukaReviewJawaban() {
+            bukaAudio();
+            sfxKlik();
+            const wadah = document.getElementById('wadah-daftar-review');
+            wadah.innerHTML = '';
+
+            if (!stateKuis || !stateKuis.riwayatRonde || stateKuis.riwayatRonde.length === 0) {
+                const kosong = document.createElement('div');
+                kosong.className = 'text-center py-8 font-extrabold text-slate-500';
+                kosong.textContent = 'Belum ada jawaban.';
+                wadah.appendChild(kosong);
+                tampilOverlay('overlay-review', true);
+                return;
+            }
+
+            const huruf = ['A', 'B', 'C', 'D'];
+            stateKuis.riwayatRonde.forEach(function (item) {
+                const kartu = document.createElement('div');
+                kartu.className = 'bg-white border-2 border-slate-200 rounded-2xl p-4 md:p-5 text-left shadow-sm space-y-3';
+
+                const svgHtml = item.svg ? '<div style="margin-bottom:12px;background:#f8fafc;padding:6px;border:1px solid #cbd5e1;border-radius:12px;text-align:center;">' + item.svg + '</div>' : '';
+
+                const kepala = document.createElement('div');
+                kepala.className = 'font-extrabold text-sm md:text-base text-slate-900';
+                kepala.innerHTML = svgHtml + item.nomor + '. ' + item.q;
+
+                const gridRegu = document.createElement('div');
+                gridRegu.className = 'grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs md:text-sm font-extrabold';
+
+                const kotakMerah = document.createElement('div');
+                kotakMerah.className = 'p-3 rounded-xl border-2 ' + (item.merahBenar ? 'bg-emerald-50 border-emerald-400 text-emerald-900' : 'bg-rose-50 border-rose-300 text-rose-900');
+                const jwbM = item.pilMerah !== null ? (huruf[item.pilMerah] + '. ' + item.opsi[item.pilMerah]) : 'Tidak menjawab';
+                kotakMerah.innerHTML = '🔴 ' + stateKuis.reguMerah.nama + ':<br>' + jwbM + (item.merahBenar ? ' <span class="text-emerald-600">(✓ Benar)</span>' : ' <span class="text-rose-600">(✗ Salah)</span>');
+
+                const kotakBiru = document.createElement('div');
+                kotakBiru.className = 'p-3 rounded-xl border-2 ' + (item.biruBenar ? 'bg-emerald-50 border-emerald-400 text-emerald-900' : 'bg-rose-50 border-rose-300 text-rose-900');
+                const jwbB = item.pilBiru !== null ? (huruf[item.pilBiru] + '. ' + item.opsi[item.pilBiru]) : 'Tidak menjawab';
+                kotakBiru.innerHTML = '🔵 ' + stateKuis.reguBiru.nama + ':<br>' + jwbB + (item.biruBenar ? ' <span class="text-emerald-600">(✓ Benar)</span>' : ' <span class="text-rose-600">(✗ Salah)</span>');
+
+                gridRegu.appendChild(kotakMerah);
+                gridRegu.appendChild(kotakBiru);
+
+                const kunci = document.createElement('div');
+                kunci.className = 'text-xs md:text-sm font-extrabold text-emerald-900 bg-emerald-100 px-4 py-2 rounded-xl';
+                kunci.textContent = '🔑 Kunci Jawaban: ' + huruf[item.benar] + '. ' + item.opsi[item.benar];
+
+                const bahas = document.createElement('div');
+                bahas.className = 'text-xs md:text-sm font-bold text-slate-700 bg-slate-100 px-4 py-3 rounded-xl leading-relaxed';
+                bahas.textContent = '💡 Pembahasan: ' + item.jelas;
+
+                kartu.appendChild(kepala);
+                kartu.appendChild(gridRegu);
+                kartu.appendChild(kunci);
+                kartu.appendChild(bahas);
+                wadah.appendChild(kartu);
+            });
+
+            tampilOverlay('overlay-review', true);
+        }
+
+        function picuPeringatanAntiCurang() {
+            if (!kuisBerjalan || !stateKuis) return;
+            stateKuis.keluarTab = (stateKuis.keluarTab || 0) + 1;
+            document.getElementById('teks-keluar-tab').textContent = String(stateKuis.keluarTab);
+            document.getElementById('angka-anticurang-modal').textContent = String(stateKuis.keluarTab);
+            simpanProgresSesi();
+            bunyikanSirine();
+            tampilOverlay('overlay-anticurang', true);
+        }
+
+        document.addEventListener('visibilitychange', function () {
+            if (!kuisBerjalan) return;
+            if (document.visibilityState === 'hidden') {
+                picuPeringatanAntiCurang();
+            } else if (document.visibilityState === 'visible') {
+                const modal = document.getElementById('overlay-anticurang');
+                if (modal && modal.classList.contains('tampil')) {
+                    bunyikanSirine();
+                }
+            }
+        });
+
+        window.addEventListener('pagehide', function () {
+            if (kuisBerjalan) {
+                picuPeringatanAntiCurang();
+            }
+        });
+
+        function formatWaktuLokal() {
+            try {
+                const d = new Date();
+                const pad = function (n) { return n < 10 ? '0' + n : String(n); };
+                return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + ' ' +
+                    pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+            } catch (e) {
+                return new Date().toISOString();
+            }
+        }
+
+        function inisialisasiDataMockAwal() {
+            const ada = bacaStorage(KEY_MOCK_DATA, null);
+            if (ada && Array.isArray(ada) && ada.length > 0) return;
+            const contoh = [
+                {
+                    waktu: '2026-08-17 08:30:12',
+                    idSesi: 'CONTOH_10_2_K1',
+                    nama: 'Kelompok 1',
+                    kelas: '10-2',
+                    skor: 80,
+                    benar: 8,
+                    total: 18,
+                    durasiDetik: 145,
+                    keluarTab: 0,
+                    ekstra: JSON.stringify({ lawan: 'Kelompok 2', hasil: 'MENANG 🏆', langkah: '5/5', skorLawan: 60 })
+                },
+                {
+                    waktu: '2026-08-17 08:30:12',
+                    idSesi: 'CONTOH_10_2_K2',
+                    nama: 'Kelompok 2',
+                    kelas: '10-2',
+                    skor: 60,
+                    benar: 6,
+                    total: 18,
+                    durasiDetik: 145,
+                    keluarTab: 0,
+                    ekstra: JSON.stringify({ lawan: 'Kelompok 1', hasil: 'KALAH', langkah: '3/5', skorLawan: 80 })
+                }
+            ];
+            tulisStorage(KEY_MOCK_DATA, contoh);
+        }
+
+        function mockServer(namaFungsi, args) {
+            inisialisasiDataMockAwal();
+            const daftar = bacaStorage(KEY_MOCK_DATA, []);
+
+            if (namaFungsi === 'simpanNilai') {
+                let objek = args && args[0] ? args[0] : {};
+                if (typeof objek === 'string') {
+                    objek = JSON.parse(objek);
+                }
+                if (!objek.nama || !objek.kelas) {
+                    return { ok: false, pesan: 'Nama regu dan kelas wajib diisi' };
+                }
+                const sudahAda = daftar.some(function (item) {
+                    return item.idSesi && item.idSesi === objek.idSesi;
+                });
+                if (sudahAda) {
+                    return { ok: true, duplikat: true };
+                }
+                daftar.unshift({
+                    waktu: formatWaktuLokal(),
+                    idSesi: String(objek.idSesi || buatIdUnik('MOCK')),
+                    nama: String(objek.nama).substring(0, 200),
+                    kelas: String(objek.kelas).substring(0, 200),
+                    skor: Number(objek.skor) || 0,
+                    benar: Number(objek.benar) || 0,
+                    total: Number(objek.total) || 18,
+                    durasiDetik: Number(objek.durasiDetik) || 0,
+                    keluarTab: Number(objek.keluarTab) || 0,
+                    ekstra: typeof objek.ekstra === 'object' ? JSON.stringify(objek.ekstra) : String(objek.ekstra || '')
+                });
+                tulisStorage(KEY_MOCK_DATA, daftar);
+                return { ok: true, duplikat: false };
+            }
+
+            if (namaFungsi === 'ambilRekapData') {
+                const pinMasuk = String((args && args[0]) || '').trim();
+                if (pinMasuk !== INFO_APP.pinDefault) {
+                    return { ok: false, pesan: 'PIN salah' };
+                }
+                return { ok: true, data: daftar };
+            }
+
+            if (namaFungsi === 'cekKoneksi') {
+                return { ok: true, baris: daftar.length, tab: 'RekapNilai (Mode Preview)' };
+            }
+
+            if (namaFungsi === 'getUrlAplikasi') {
+                return window.location.href;
+            }
+
+            return { ok: false, pesan: 'Fungsi tidak dikenal' };
+        }
+
+        function panggilServer(nama, args, batasMs) {
+            return new Promise(function (resolve, reject) {
+                if (!ADA_GAS) {
+                    try {
+                        resolve(mockServer(nama, args));
+                    } catch (e) {
+                        reject(e);
+                    }
+                    return;
+                }
+                let selesai = false;
+                const t = setTimeout(function () {
+                    if (!selesai) {
+                        selesai = true;
+                        reject(new Error('Waktu habis menunggu server (25 detik)'));
+                    }
+                }, batasMs || 25000);
+
+                try {
+                    const r = google.script.run
+                        .withSuccessHandler(function (h) {
+                            if (!selesai) {
+                                selesai = true;
+                                clearTimeout(t);
+                                resolve(h);
+                            }
+                        })
+                        .withFailureHandler(function (err) {
+                            if (!selesai) {
+                                selesai = true;
+                                clearTimeout(t);
+                                reject(err);
+                            }
+                        });
+                    r[nama].apply(r, args || []);
+                } catch (e) {
+                    if (!selesai) {
+                        selesai = true;
+                        clearTimeout(t);
+                        reject(e);
+                    }
+                }
+            });
+        }
+
+        function tunggu(ms) {
+            return new Promise(function (r) { setTimeout(r, ms); });
+        }
+
+        function kirimSatu(data) {
+            const jeda = [0, 2000, 5000, 10000];
+            function coba(n) {
+                return tunggu(jeda[n]).then(function () {
+                    return panggilServer('simpanNilai', [JSON.stringify(data)]);
+                }).then(function (r) {
+                    if (r && r.ok) return { ok: true };
+                    if (r && r.ulang && n < 3) return coba(n + 1);
+                    return { ok: false, server: true, pesan: (r && r.pesan) || 'Server tidak memberi alasan' };
+                }).catch(function (err) {
+                    if (n < 3) return coba(n + 1);
+                    return { ok: false, server: false, pesan: String(err && err.message ? err.message : err) };
+                });
+            }
+            return coba(0);
+        }
+
+        let sedangMemprosesAntrean = false;
+
+        function perbaruiStatusSimpanUI(statusTeks, detailTeks, warnaKelas, tampilTombolUlang) {
+            const elTeks = document.getElementById('status-simpan-teks');
+            const elDetail = document.getElementById('status-simpan-detail');
+            const btnHasil = document.getElementById('btn-kirim-ulang-hasil');
+            const btnStart = document.getElementById('btn-kirim-ulang-start');
+            const infoStart = document.getElementById('info-antrean-start');
+
+            if (elTeks) {
+                elTeks.className = 'px-3 py-1 rounded-full font-extrabold text-xs border ' + warnaKelas;
+                elTeks.textContent = statusTeks;
+            }
+            if (elDetail) {
+                elDetail.textContent = detailTeks;
+            }
+            if (btnHasil) {
+                btnHasil.style.display = tampilTombolUlang ? 'inline-block' : 'none';
+            }
+
+            const antrean = bacaStorage(KEY_ANTREAN, []);
+            if (infoStart) {
+                infoStart.textContent = antrean.length > 0
+                    ? ('⏳ Antrean belum terkirim: ' + antrean.length + ' data')
+                    : 'Status Rekap: Tersimpan ✓';
+            }
+            if (btnStart) {
+                btnStart.style.display = antrean.length > 0 ? 'inline-block' : 'none';
+            }
+        }
+
+        function masukkanKeAntreanDanKirim(daftarDataBaru) {
+            const antrean = bacaStorage(KEY_ANTREAN, []);
+            daftarDataBaru.forEach(function (itemBaru) {
+                const sudah = antrean.some(function (x) { return x.idSesi === itemBaru.idSesi; });
+                if (!sudah) {
+                    antrean.push(itemBaru);
+                }
+            });
+            tulisStorage(KEY_ANTREAN, antrean);
+            prosesAntreanSimpan();
+        }
+
+        function prosesAntreanSimpan() {
+            const antrean = bacaStorage(KEY_ANTREAN, []);
+            if (antrean.length === 0) {
+                perbaruiStatusSimpanUI('Tersimpan ✓', 'Seluruh nilai kelompok telah tercatat di rekap.', 'bg-emerald-100 text-emerald-900 border-emerald-300', false);
+                return;
+            }
+            if (sedangMemprosesAntrean) return;
+            sedangMemprosesAntrean = true;
+
+            perbaruiStatusSimpanUI('Menyimpan…', 'Mengirim ' + antrean.length + ' data kelompok ke server...', 'bg-amber-100 text-amber-900 border-amber-300', false);
+
+            function kirimBerikutnya() {
+                const daftarSaatIni = bacaStorage(KEY_ANTREAN, []);
+                if (daftarSaatIni.length === 0) {
+                    sedangMemprosesAntrean = false;
+                    perbaruiStatusSimpanUI('Tersimpan ✓', 'Seluruh nilai kelompok berhasil disimpan ke sistem.', 'bg-emerald-100 text-emerald-900 border-emerald-300', false);
+                    return;
+                }
+                const target = daftarSaatIni[0];
+                kirimSatu(target).then(function (hasil) {
+                    if (hasil.ok) {
+                        const sisa = bacaStorage(KEY_ANTREAN, []).filter(function (x) {
+                            return x.idSesi !== target.idSesi;
+                        });
+                        tulisStorage(KEY_ANTREAN, sisa);
+                        kirimBerikutnya();
+                    } else {
+                        sedangMemprosesAntrean = false;
+                        if (hasil.server) {
+                            perbaruiStatusSimpanUI(
+                                'Ditolak: ' + hasil.pesan,
+                                'Data aman di perangkat. Alasan teknis: ' + hasil.pesan,
+                                'bg-rose-100 text-rose-900 border-rose-300',
+                                true
+                            );
+                        } else {
+                            perbaruiStatusSimpanUI(
+                                'Mencoba lagi otomatis…',
+                                'Gangguan jaringan (' + hasil.pesan + '). Dicoba ulang dlm 15 detik.',
+                                'bg-amber-100 text-amber-900 border-amber-300',
+                                true
+                            );
+                        }
+                    }
+                });
+            }
+
+            kirimBerikutnya();
+        }
+
+        let pinGuruTersimpan = '';
+        let dataRekapMentah = [];
+        let timerAutoRefreshDasbor = null;
+
+        function bukaModalDasbor() {
+            bukaAudio();
+            sfxKlik();
+            tampilOverlay('overlay-dasbor', true);
+            cekLencanaKoneksiServer();
+
+            if (pinGuruTersimpan) {
+                document.getElementById('panel-login-pin').style.display = 'none';
+                document.getElementById('panel-isi-dasbor').style.display = 'flex';
+                document.getElementById('btn-refresh-dasbor').style.display = 'inline-block';
+                muatDataRekapServer(pinGuruTersimpan, false);
+                mulaiAutoRefreshDasbor();
+            } else {
+                document.getElementById('panel-login-pin').style.display = 'block';
+                document.getElementById('panel-isi-dasbor').style.display = 'none';
+                document.getElementById('btn-refresh-dasbor').style.display = 'none';
+                document.getElementById('input-pin-dasbor').value = '';
+                document.getElementById('pesan-error-pin').style.display = 'none';
+            }
+        }
+
+        function tutupModalDasbor() {
+            sfxKlik();
+            tampilOverlay('overlay-dasbor', false);
+            if (timerAutoRefreshDasbor) {
+                clearInterval(timerAutoRefreshDasbor);
+                timerAutoRefreshDasbor = null;
+            }
+        }
+
+        function mulaiAutoRefreshDasbor() {
+            if (timerAutoRefreshDasbor) clearInterval(timerAutoRefreshDasbor);
+            timerAutoRefreshDasbor = setInterval(function () {
+                const modal = document.getElementById('overlay-dasbor');
+                if (modal && modal.classList.contains('tampil') && pinGuruTersimpan) {
+                    muatDataRekapServer(pinGuruTersimpan, true);
+                }
+            }, 20000);
+        }
+
+        function cekLencanaKoneksiServer() {
+            const badge = document.getElementById('badge-koneksi-server');
+            if (!badge) return;
+            panggilServer('cekKoneksi', [], 12000).then(function (r) {
+                if (r && r.ok) {
+                    badge.className = 'text-[11px] md:text-xs font-extrabold px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 w-max';
+                    badge.textContent = 'Server: Tersambung ✓ (' + r.baris + ' baris)';
+                } else {
+                    badge.className = 'text-[11px] md:text-xs font-extrabold px-3 py-1 rounded-full bg-rose-100 text-rose-800 border border-rose-300 w-max';
+                    badge.textContent = 'Server: Bermasalah ✗';
+                }
+            }).catch(function (err) {
+                badge.className = 'text-[11px] md:text-xs font-extrabold px-3 py-1 rounded-full bg-rose-100 text-rose-800 border border-rose-300 w-max';
+                badge.textContent = 'Server: Bermasalah ✗';
+            });
+        }
+
+        function verifikasiPinDanMasuk() {
+            bukaAudio();
+            sfxKlik();
+            const pin = document.getElementById('input-pin-dasbor').value.trim();
+            const errEl = document.getElementById('pesan-error-pin');
+            if (!pin) {
+                errEl.style.display = 'block';
+                errEl.textContent = '⚠️ Silakan ketik PIN terlebih dahulu.';
+                return;
+            }
+            errEl.style.display = 'none';
+            muatDataRekapServer(pin, false);
+        }
+
+        function muatDataRekapServer(pin, adalahAutoRefresh) {
+            panggilServer('ambilRekapData', [pin], 20000).then(function (respon) {
+                if (!respon || !respon.ok) {
+                    if (!adalahAutoRefresh) {
+                        const errEl = document.getElementById('pesan-error-pin');
+                        errEl.style.display = 'block';
+                        errEl.textContent = '❌ ' + ((respon && respon.pesan) || 'PIN salah');
+                        sfxSalah();
+                    }
+                    return;
+                }
+                pinGuruTersimpan = pin;
+                document.getElementById('panel-login-pin').style.display = 'none';
+                document.getElementById('panel-isi-dasbor').style.display = 'flex';
+                document.getElementById('btn-refresh-dasbor').style.display = 'inline-block';
+
+                siapkanDataDenganPercobaan(respon.data || []);
+                renderIsiDasbor();
+                if (!timerAutoRefreshDasbor) mulaiAutoRefreshDasbor();
+            }).catch(function (err) {
+                if (!adalahAutoRefresh) {
+                    const errEl = document.getElementById('pesan-error-pin');
+                    errEl.style.display = 'block';
+                    errEl.textContent = '⚠️ Gagal menghubungi server.';
+                }
+            });
+        }
+
+        function siapkanDataDenganPercobaan(daftar) {
+            const terbalik = daftar.slice().reverse();
+            const penghitung = {};
+            terbalik.forEach(function (baris) {
+                const kunci = (String(baris.nama || '').toLowerCase().trim()) + '__' + (String(baris.kelas || '').toLowerCase().trim());
+                penghitung[kunci] = (penghitung[kunci] || 0) + 1;
+                baris.percobaanKe = penghitung[kunci];
+            });
+            dataRekapMentah = terbalik.reverse();
+
+            const selectFilter = document.getElementById('filter-kelas-rekap');
+            if (selectFilter) {
+                const sudahAda = {};
+                for (let i = 0; i < selectFilter.options.length; i++) {
+                    sudahAda[selectFilter.options[i].value] = true;
+                }
+                dataRekapMentah.forEach(function (d) {
+                    const kls = String(d.kelas || '').trim();
+                    if (kls && !sudahAda[kls]) {
+                        sudahAda[kls] = true;
+                        const opt = document.createElement('option');
+                        opt.value = kls;
+                        opt.textContent = '🏫 Kelas ' + kls;
+                        selectFilter.appendChild(opt);
+                    }
+                });
+            }
+        }
+
+        function uraiInfoEkstra(ekstraMentah) {
+            if (!ekstraMentah) return '-';
+            try {
+                const obj = typeof ekstraMentah === 'string' ? JSON.parse(ekstraMentah) : ekstraMentah;
+                if (obj && typeof obj === 'object') {
+                    const bagian = [];
+                    if (obj.hasil) bagian.push(obj.hasil);
+                    if (obj.langkah) bagian.push('Langkah ' + obj.langkah);
+                    if (obj.lawan) bagian.push('vs ' + obj.lawan + (obj.skorLawan !== undefined ? ' (' + obj.skorLawan + ')' : ''));
+                    return bagian.join(' | ') || String(ekstraMentah);
+                }
+                return String(ekstraMentah);
+            } catch (e) {
+                return String(ekstraMentah);
+            }
+        }
+
+        function ambilDataRekapTersaring() {
+            const kataCari = (document.getElementById('input-cari-rekap').value || '').toLowerCase().trim();
+            const kelasPilih = document.getElementById('filter-kelas-rekap').value || 'SEMUA';
+            const urutan = document.getElementById('urutkan-rekap').value || 'TERBARU';
+
+            const hasil = dataRekapMentah.filter(function (item) {
+                const cocokKelas = kelasPilih === 'SEMUA' || String(item.kelas) === kelasPilih;
+                if (!cocokKelas) return false;
+                if (!kataCari) return true;
+                const gabungan = (String(item.nama) + ' ' + String(item.kelas) + ' ' + String(item.ekstra || '')).toLowerCase();
+                return gabungan.indexOf(kataCari) !== -1;
+            });
+
+            if (urutan === 'SKOR_TINGGI') {
+                hasil.sort(function (a, b) { return (Number(b.skor) || 0) - (Number(a.skor) || 0); });
+            } else if (urutan === 'NAMA_AZ') {
+                hasil.sort(function (a, b) { return String(a.nama).localeCompare(String(b.nama)); });
+            }
+            return hasil;
+        }
+
+        function renderIsiDasbor() {
+            const tersaring = ambilDataRekapTersaring();
+            const tbody = document.getElementById('tbody-rekap');
+            tbody.innerHTML = '';
+
+            const total = tersaring.length;
+            let jumlahSkor = 0;
+            let tertinggi = 0;
+            tersaring.forEach(function (d) {
+                const s = Number(d.skor) || 0;
+                jumlahSkor += s;
+                if (s > tertinggi) tertinggi = s;
+            });
+            const rata = total > 0 ? Math.round(jumlahSkor / total) : 0;
+
+            document.getElementById('stat-total').textContent = String(total);
+            document.getElementById('stat-rata').textContent = String(rata);
+            document.getElementById('stat-tinggi').textContent = String(tertinggi);
+
+            if (tersaring.length === 0) {
+                const tr = document.createElement('tr');
+                const td = document.createElement('td');
+                td.colSpan = 9;
+                td.className = 'p-8 text-center font-extrabold text-slate-400';
+                td.textContent = 'Belum ada data rekap untuk pencarian/filter ini.';
+                tr.appendChild(td);
+                tbody.appendChild(tr);
+                return;
+            }
+
+            tersaring.forEach(function (item, idx) {
+                const tr = document.createElement('tr');
+                tr.className = idx % 2 === 0 ? 'bg-white' : 'bg-slate-50';
+
+                function buatSel(label, isi, kelasTambahan) {
+                    const td = document.createElement('td');
+                    td.setAttribute('data-label', label);
+                    td.className = 'p-3 ' + (kelasTambahan || '');
+                    td.textContent = isi;
+                    return td;
+                }
+
+                const lulus = (Number(item.skor) || 0) >= INFO_APP.kkm;
+                tr.appendChild(buatSel('Waktu', String(item.waktu || '-')));
+                tr.appendChild(buatSel('Nama Kelompok', String(item.nama || '-'), 'font-extrabold text-slate-900'));
+                tr.appendChild(buatSel('Kelas', String(item.kelas || '-')));
+                tr.appendChild(buatSel('Skor', String(item.skor || 0), lulus ? 'font-extrabold text-emerald-700 text-center' : 'font-extrabold text-rose-700 text-center'));
+                tr.appendChild(buatSel('Benar/Total', (item.benar || 0) + '/' + (item.total || 18), 'text-center'));
+                tr.appendChild(buatSel('Durasi', formatDurasi(Number(item.durasiDetik) || 0), 'hidden md:table-cell text-center'));
+                tr.appendChild(buatSel('Keluar Tab', String(item.keluarTab || 0), 'text-center text-red-600 font-bold'));
+                tr.appendChild(buatSel('Percobaan', 'Ke-' + (item.percobaanKe || 1), 'hidden xl:table-cell text-center'));
+                tr.appendChild(buatSel('Pertandingan', uraiInfoEkstra(item.ekstra), 'text-xs text-slate-500'));
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        function siapkanDataLaporanUnduh() {
+            const dataUrut = ambilDataRekapTersaring().slice().sort(function (a, b) {
+                return (Number(b.skor) || 0) - (Number(a.skor) || 0);
+            });
+
+            const total = dataUrut.length;
+            let jumSkor = 0;
+            let tertinggi = total > 0 ? (Number(dataUrut[0].skor) || 0) : 0;
+            let terendah = total > 0 ? (Number(dataUrut[total - 1].skor) || 0) : 0;
+            let jumLulus = 0;
+
+            dataUrut.forEach(function (d) {
+                const s = Number(d.skor) || 0;
+                jumSkor += s;
+                if (s > tertinggi) tertinggi = s;
+                if (s < terendah) terendah = s;
+                if (s >= INFO_APP.kkm) jumLulus++;
+            });
+
+            const rata = total > 0 ? (jumSkor / total).toFixed(1) : '0';
+            const persenLulus = total > 0 ? Math.round((jumLulus / total) * 100) : 0;
+            const filterKls = document.getElementById('filter-kelas-rekap').value;
+            const labelKelas = filterKls === 'SEMUA' ? 'Semua Kelas (10-1 s.d. 10-7)' : ('Kelas ' + filterKls);
+            const tglCetak = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
+            const tglFile = new Date().toISOString().slice(0, 10);
+
+            return {
+                daftar: dataUrut,
+                total: total,
+                rata: rata,
+                tertinggi: tertinggi,
+                terendah: terendah,
+                lulusTeks: jumLulus + ' (' + persenLulus + '%)',
+                labelKelas: labelKelas,
+                tglCetak: tglCetak,
+                tglFile: tglFile
+            };
+        }
+
+        function unduhExcelCSV() {
+            sfxKlik();
+            const lap = siapkanDataLaporanUnduh();
+            const baris = [];
+            baris.push(['REKAP NILAI ' + INFO_APP.judul.toUpperCase()]);
+            baris.push(['Instansi', INFO_APP.instansi]);
+            baris.push(['Mapel / Topik', 'Sosiologi - ' + INFO_APP.subjudul]);
+            baris.push(['Kelas', lap.labelKelas]);
+            baris.push(['Tanggal Cetak', lap.tglCetak]);
+            baris.push(['Game by', INFO_APP.pembuat]);
+            baris.push([]);
+            baris.push(['Total Kelompok', lap.total, 'Rata-rata', lap.rata, 'Tertinggi', lap.tertinggi, 'Terendah', lap.terendah, 'Tuntas KKM', lap.lulusTeks]);
+            baris.push([]);
+            baris.push(['No', 'Nama Kelompok', 'Kelas', 'Skor', 'Benar/Total', 'Durasi (mm:ss)', 'Keluar Tab', 'Percobaan', 'Status', 'Detail Pertandingan']);
+
+            lap.daftar.forEach(function (d, i) {
+                const skor = Number(d.skor) || 0;
+                const status = skor >= INFO_APP.kkm ? 'Lulus' : 'Belum Lulus';
+                baris.push([
+                    i + 1,
+                    d.nama,
+                    d.kelas,
+                    skor,
+                    (d.benar || 0) + '/' + (d.total || 18),
+                    formatDurasi(Number(d.durasiDetik) || 0),
+                    Number(d.keluarTab) || 0,
+                    'Ke-' + (d.percobaanKe || 1),
+                    status,
+                    uraiInfoEkstra(d.ekstra)
+                ]);
+            });
+
+            const csvTeks = '\ufeff' + baris.map(function (r) {
+                return r.map(function (sel) {
+                    const s = String(sel === undefined || sel === null ? '' : sel).replace(/"/g, '""');
+                    return '"' + s + '"';
+                }).join(';');
+            }).join('\r\n');
+
+            const blob = new Blob([csvTeks], { type: 'text/csv;charset=utf-8;' });
+            unduhBlobFile(blob, 'Rekap-Panjat-Pinang-Sosiologi-' + lap.tglFile + '.csv');
+        }
+
+        function bangunHtmlLaporan(lap) {
+            let barisHtml = '';
+            lap.daftar.forEach(function (d, i) {
+                const skor = Number(d.skor) || 0;
+                const lulus = skor >= INFO_APP.kkm;
+                const bgBaris = i % 2 === 0 ? '#ffffff' : '#fef2f2';
+                const warnaSkor = lulus ? '#15803d' : '#b91c1c';
+                barisHtml += '<tr style="background:' + bgBaris + ';">' +
+                    '<td style="border:1px solid #cbd5e1;padding:6px;text-align:center;">' + (i + 1) + '</td>' +
+                    '<td style="border:1px solid #cbd5e1;padding:6px;font-weight:bold;">' + escapeHtml(d.nama) + '</td>' +
+                    '<td style="border:1px solid #cbd5e1;padding:6px;text-align:center;">' + escapeHtml(d.kelas) + '</td>' +
+                    '<td style="border:1px solid #cbd5e1;padding:6px;text-align:center;font-weight:bold;color:' + warnaSkor + ';">' + skor + '</td>' +
+                    '<td style="border:1px solid #cbd5e1;padding:6px;text-align:center;">' + (d.benar || 0) + '/' + (d.total || 18) + '</td>' +
+                    '<td style="border:1px solid #cbd5e1;padding:6px;text-align:center;">' + formatDurasi(Number(d.durasiDetik) || 0) + '</td>' +
+                    '<td style="border:1px solid #cbd5e1;padding:6px;text-align:center;">' + (d.keluarTab || 0) + '</td>' +
+                    '<td style="border:1px solid #cbd5e1;padding:6px;text-align:center;">Ke-' + (d.percobaanKe || 1) + '</td>' +
+                    '<td style="border:1px solid #cbd5e1;padding:6px;text-align:center;font-weight:bold;color:' + warnaSkor + ';">' + (lulus ? 'Lulus' : 'Belum Lulus') + '</td>' +
+                    '</tr>';
+            });
+
+            return '<div style="font-family:Arial,sans-serif;color:#1e293b;">' +
+                '<div style="background:#dc2626;color:#ffffff;padding:14px 18px;border-radius:8px;margin-bottom:12px;">' +
+                '<h2 style="margin:0;font-size:18pt;">REKAP NILAI ' + escapeHtml(INFO_APP.judul.toUpperCase()) + '</h2>' +
+                '<p style="margin:4px 0 0 0;font-size:10pt;">' + escapeHtml(INFO_APP.instansi) + ' | Kelas: ' + escapeHtml(lap.labelKelas) + ' | Topik: ' + escapeHtml(INFO_APP.subjudul) + '</p>' +
+                '<p style="margin:2px 0 0 0;font-size:9pt;">Dicetak: ' + escapeHtml(lap.tglCetak) + ' | Game by ' + escapeHtml(INFO_APP.pembuat) + '</p>' +
+                '</div>' +
+                '<table style="width:100%;border-collapse:collapse;margin-bottom:14px;">' +
+                '<tr>' +
+                '<td style="border:2px solid #fca5a5;background:#fef2f2;padding:8px;text-align:center;width:20%;"><div style="font-size:8pt;color:#991b1b;">TOTAL KELOMPOK</div><div style="font-size:14pt;font-weight:bold;color:#dc2626;">' + lap.total + '</div></td>' +
+                '<td style="border:2px solid #fca5a5;background:#fef2f2;padding:8px;text-align:center;width:20%;"><div style="font-size:8pt;color:#991b1b;">RATA-RATA</div><div style="font-size:14pt;font-weight:bold;color:#dc2626;">' + lap.rata + '</div></td>' +
+                '<td style="border:2px solid #fca5a5;background:#fef2f2;padding:8px;text-align:center;width:20%;"><div style="font-size:8pt;color:#991b1b;">TERTINGGI</div><div style="font-size:14pt;font-weight:bold;color:#15803d;">' + lap.tertinggi + '</div></td>' +
+                '<td style="border:2px solid #fca5a5;background:#fef2f2;padding:8px;text-align:center;width:20%;"><div style="font-size:8pt;color:#991b1b;">TERENDAH</div><div style="font-size:14pt;font-weight:bold;color:#b91c1c;">' + lap.terendah + '</div></td>' +
+                '<td style="border:2px solid #fca5a5;background:#fef2f2;padding:8px;text-align:center;width:20%;"><div style="font-size:8pt;color:#991b1b;">LULUS KKM (' + INFO_APP.kkm + ')</div><div style="font-size:14pt;font-weight:bold;color:#1d4ed8;">' + lap.lulusTeks + '</div></td>' +
+                '</tr>' +
+                '</table>' +
+                '<table style="width:100%;border-collapse:collapse;font-size:9.5pt;">' +
+                '<thead><tr style="background:#b91c1c;color:#ffffff;">' +
+                '<th style="border:1px solid #991b1b;padding:7px;">No</th>' +
+                '<th style="border:1px solid #991b1b;padding:7px;text-align:left;">Nama Kelompok</th>' +
+                '<th style="border:1px solid #991b1b;padding:7px;">Kelas</th>' +
+                '<th style="border:1px solid #991b1b;padding:7px;">Skor</th>' +
+                '<th style="border:1px solid #991b1b;padding:7px;">Benar/Total</th>' +
+                '<th style="border:1px solid #991b1b;padding:7px;">Durasi</th>' +
+                '<th style="border:1px solid #991b1b;padding:7px;">Keluar Tab</th>' +
+                '<th style="border:1px solid #991b1b;padding:7px;">Percobaan</th>' +
+                '<th style="border:1px solid #991b1b;padding:7px;">Status</th>' +
+                '</tr></thead><tbody>' + barisHtml + '</tbody></table>' +
+                '</div>';
+        }
+
+        function escapeHtml(teks) {
+            return String(teks || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function unduhWordDoc() {
+            sfxKlik();
+            const lap = siapkanDataLaporanUnduh();
+            const isi = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>@page { size: A4 landscape; margin: 12mm; }</style></head><body>' +
+                bangunHtmlLaporan(lap) + '</body></html>';
+            const blob = new Blob(['\ufeff', isi], { type: 'application/msword' });
+            unduhBlobFile(blob, 'Rekap-Panjat-Pinang-Sosiologi-' + lap.tglFile + '.doc');
+        }
+
+        function unduhLaporanPDF() {
+            sfxKlik();
+            const lap = siapkanDataLaporanUnduh();
+
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                const area = document.getElementById('areaCetak');
+                area.innerHTML = bangunHtmlLaporan(lap);
+                window.print();
+                return;
+            }
+
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+                doc.setFillColor(220, 38, 38);
+                doc.rect(0, 0, 297, 24, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(15);
+                doc.text('REKAP NILAI ' + INFO_APP.judul.toUpperCase(), 14, 10);
+                doc.setFontSize(9.5);
+                doc.setFont('helvetica', 'normal');
+                doc.text(INFO_APP.instansi + '  |  Kelas: ' + lap.labelKelas + '  |  Mapel: Sosiologi (' + INFO_APP.subjudul + ')', 14, 16);
+                doc.text('Tanggal Cetak: ' + lap.tglCetak + '  |  Game by ' + INFO_APP.pembuat, 14, 21);
+
+                const kotak = [
+                    { label: 'TOTAL KELOMPOK', nilai: String(lap.total) },
+                    { label: 'RATA-RATA', nilai: String(lap.rata) },
+                    { label: 'TERTINGGI', nilai: String(lap.tertinggi) },
+                    { label: 'TERENDAH', nilai: String(lap.terendah) },
+                    { label: 'LULUS KKM (' + INFO_APP.kkm + ')', nilai: lap.lulusTeks }
+                ];
+                kotak.forEach(function (k, idx) {
+                    const x = 14 + idx * 54.5;
+                    doc.setDrawColor(220, 38, 38);
+                    doc.setFillColor(254, 242, 242);
+                    doc.roundedRect(x, 28, 51.5, 16, 2, 2, 'FD');
+                    doc.setTextColor(153, 27, 27);
+                    doc.setFontSize(7.5);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(k.label, x + 25.75, 33.5, { align: 'center' });
+                    doc.setTextColor(30, 41, 59);
+                    doc.setFontSize(12);
+                    doc.text(k.nilai, x + 25.75, 41, { align: 'center' });
+                });
+
+                const bodyTabel = lap.daftar.map(function (d, i) {
+                    const skor = Number(d.skor) || 0;
+                    return [
+                        i + 1,
+                        String(d.nama || '-'),
+                        String(d.kelas || '-'),
+                        skor,
+                        (d.benar || 0) + '/' + (d.total || 18),
+                        formatDurasi(Number(d.durasiDetik) || 0),
+                        Number(d.keluarTab) || 0,
+                        'Ke-' + (d.percobaanKe || 1),
+                        skor >= INFO_APP.kkm ? 'Lulus' : 'Belum Lulus'
+                    ];
+                });
+
+                doc.autoTable({
+                    startY: 48,
+                    head: [['No', 'Nama Kelompok', 'Kelas', 'Skor', 'Benar/Total', 'Durasi (mm:ss)', 'Keluar Tab', 'Percobaan', 'Status']],
+                    body: bodyTabel,
+                    theme: 'grid',
+                    headStyles: {
+                        fillColor: [185, 28, 28],
+                        textColor: [255, 255, 255],
+                        fontStyle: 'bold',
+                        halign: 'center'
+                    },
+                    alternateRowStyles: {
+                        fillColor: [254, 242, 242]
+                    },
+                    styles: {
+                        fontSize: 8.5,
+                        cellPadding: 2.5
+                    },
+                    columnStyles: {
+                        0: { halign: 'center', cellWidth: 12 },
+                        2: { halign: 'center', cellWidth: 22 },
+                        3: { halign: 'center', cellWidth: 18, fontStyle: 'bold' },
+                        4: { halign: 'center', cellWidth: 24 },
+                        5: { halign: 'center', cellWidth: 26 },
+                        6: { halign: 'center', cellWidth: 22 },
+                        7: { halign: 'center', cellWidth: 22 },
+                        8: { halign: 'center', cellWidth: 26, fontStyle: 'bold' }
+                    },
+                    didParseCell: function (data) {
+                        if (data.section === 'body' && (data.column.index === 3 || data.column.index === 8)) {
+                            const barisData = lap.daftar[data.row.index];
+                            const lulus = barisData && (Number(barisData.skor) || 0) >= INFO_APP.kkm;
+                            data.cell.styles.textColor = lulus ? [21, 128, 61] : [185, 28, 28];
+                        }
+                    }
+                });
+
+                const jumHalaman = doc.getNumberOfPages();
+                for (let i = 1; i <= jumHalaman; i++) {
+                    doc.setPage(i);
+                    doc.setFontSize(8);
+                    doc.setTextColor(100, 116, 139);
+                    doc.text('Game by ' + INFO_APP.pembuat + ' — ' + INFO_APP.instansi, 14, 203);
+                    doc.text('Halaman ' + i + ' dari ' + jumHalaman, 283, 203, { align: 'right' });
+                }
+
+                doc.save('Rekap-Panjat-Pinang-Sosiologi-' + lap.tglFile + '.pdf');
+            } catch (e) {
+                const area = document.getElementById('areaCetak');
+                area.innerHTML = bangunHtmlLaporan(lap);
+                window.print();
+            }
+        }
+
+        function unduhBlobFile(blob, namaFile) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = namaFile;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function () {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 300);
+        }
+
+        function buatElemenMelayang() {
+            const bg = document.getElementById('dynamic-bg');
+            if (!bg) return;
+            bg.innerHTML = '';
+            const daftarEmoji = ['🎋', '🏆', '🎁', '⭐', '🎉', '🧗'];
+            for (let i = 0; i < 16; i++) {
+                const item = document.createElement('div');
+                item.className = 'floating-bg-item';
+                item.textContent = daftarEmoji[i % daftarEmoji.length];
+                const ukuran = (Math.random() * 1.5 + 1).toFixed(2);
+                const posX = (Math.random() * 95).toFixed(1);
+                const tunda = (Math.random() * 12).toFixed(1);
+                const durasi = (Math.random() * 12 + 10).toFixed(1);
+
+                item.style.fontSize = ukuran + 'rem';
+                item.style.left = posX + 'vw';
+                item.style.animationDelay = tunda + 's';
+                item.style.animationDuration = durasi + 's';
+                bg.appendChild(item);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            buatElemenMelayang();
+            perbaruiLabelSuaraUI();
+
+            if (!ADA_GAS) {
+                const pitaPrev = document.getElementById('pita-preview');
+                if (pitaPrev) pitaPrev.style.display = 'block';
+                inisialisasiDataMockAwal();
+            }
+
+            document.addEventListener('pointerdown', function bukaPertama() {
+                bukaAudio();
+                document.removeEventListener('pointerdown', bukaPertama);
+            });
+
+            cekKartuLanjutkanDiStart();
+            prosesAntreanSimpan();
+
+            setInterval(function () {
+                prosesAntreanSimpan();
+            }, 15000);
+
+            window.addEventListener('online', function () {
+                prosesAntreanSimpan();
+            });
+
+            document.getElementById('select-kelas').addEventListener('change', function (e) {
+                const w = document.getElementById('wadah-kelas-lainnya');
+                w.style.display = e.target.value === 'LAINNYA' ? 'block' : 'none';
+            });
+
+            function toggleNarator() {
+                bukaAudio();
+                naratorAktif = !naratorAktif;
+                if (!naratorAktif) {
+                    hentikanSemuaSuara();
+                }
+                perbaruiLabelSuaraUI();
+                sfxKlik();
+            }
+            function toggleSfx() {
+                bukaAudio();
+                sfxAktif = !sfxAktif;
+                perbaruiLabelSuaraUI();
+                if (sfxAktif) sfxKlik();
+            }
+
+            document.getElementById('btn-toggle-narator-start').addEventListener('click', toggleNarator);
+            document.getElementById('btn-toggle-narator-kuis').addEventListener('click', toggleNarator);
+            document.getElementById('btn-toggle-sfx-start').addEventListener('click', toggleSfx);
+            document.getElementById('btn-toggle-sfx-kuis').addEventListener('click', toggleSfx);
+
+            document.getElementById('btn-fullscreen-start').addEventListener('click', function() { sfxKlik(); toggleFullScreen(); });
+            document.getElementById('btn-fullscreen-kuis').addEventListener('click', function() { sfxKlik(); toggleFullScreen(); });
+
+            document.getElementById('btn-mulai-game').addEventListener('click', mulaiKuis);
+            document.getElementById('btn-lanjutkan-sesi').addEventListener('click', lanjutkanKuisTersimpan);
+            document.getElementById('btn-reset-sesi').addEventListener('click', function () {
+                bukaAudio();
+                sfxKlik();
+                hapusProgresSesi();
+                cekKartuLanjutkanDiStart();
+            });
+
+            document.getElementById('btn-dengarkan-lagi').addEventListener('click', function () {
+                bukaAudio();
+                if (!stateKuis) return;
+                const soal = stateKuis.daftarSoal[stateKuis.indeksSoal];
+                if (!soal) return;
+                const prevNarator = naratorAktif;
+                naratorAktif = true;
+                perbaruiLabelSuaraUI();
+                bacakanTeks(soal.q, 'id-ID', null);
+                naratorAktif = prevNarator;
+                perbaruiLabelSuaraUI();
+            });
+
+            document.getElementById('btn-lewati-narasi').addEventListener('click', function () {
+                bukaAudio();
+                sfxKlik();
+                mulaiHitungMundurTigaDetik();
+            });
+
+            document.getElementById('btn-keluar-menu').addEventListener('click', function () {
+                bukaAudio();
+                sfxKlik();
+                hentikanSemuaSuara();
+                bersihkanTimerRonde();
+                kuisBerjalan = false;
+                tampilLayar('layar-start');
+                cekKartuLanjutkanDiStart();
+            });
+
+            window.addEventListener('keydown', function (e) {
+                if (!kuisBerjalan || !faseInputDibuka) return;
+                const k = e.key.toUpperCase();
+                const petaMerah = { 'A': 0, 'S': 1, 'D': 2, 'F': 3 };
+                const petaBiru = { 'J': 0, 'K': 1, 'L': 2, ';': 3, ':': 3 };
+                if (petaMerah[k] !== undefined) {
+                    pilihJawabanRegu('merah', petaMerah[k]);
+                } else if (petaBiru[k] !== undefined) {
+                    pilihJawabanRegu('biru', petaBiru[k]);
+                }
+            });
+
+            document.getElementById('btn-soal-berikutnya').addEventListener('click', lanjutKeSoalBerikutnya);
+
+            document.getElementById('btn-buka-review').addEventListener('click', bukaReviewJawaban);
+            document.getElementById('btn-tutup-review').addEventListener('click', function () {
+                sfxKlik();
+                tampilOverlay('overlay-review', false);
+            });
+            document.getElementById('btn-main-lagi').addEventListener('click', function () {
+                bukaAudio();
+                sfxKlik();
+                hentikanSemuaSuara();
+                mulaiKuis();
+            });
+            document.getElementById('btn-hasil-ke-menu').addEventListener('click', function () {
+                bukaAudio();
+                sfxKlik();
+                hentikanSemuaSuara();
+                kuisBerjalan = false;
+                tampilLayar('layar-start');
+                cekKartuLanjutkanDiStart();
+            });
+
+            document.getElementById('btn-kirim-ulang-hasil').addEventListener('click', function () {
+                bukaAudio();
+                sfxKlik();
+                prosesAntreanSimpan();
+            });
+            document.getElementById('btn-kirim-ulang-start').addEventListener('click', function () {
+                bukaAudio();
+                sfxKlik();
+                prosesAntreanSimpan();
+            });
+
+            document.getElementById('btn-tutup-anticurang').addEventListener('click', function () {
+                hentikanSemuaSuara();
+                sfxKlik();
+                tampilOverlay('overlay-anticurang', false);
+            });
+
+            document.getElementById('btn-buka-dasbor').addEventListener('click', bukaModalDasbor);
+            document.getElementById('btn-tutup-dasbor').addEventListener('click', tutupModalDasbor);
+            document.getElementById('btn-masuk-dasbor').addEventListener('click', verifikasiPinDanMasuk);
+            document.getElementById('input-pin-dasbor').addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') verifikasiPinDanMasuk();
+            });
+            document.getElementById('btn-refresh-dasbor').addEventListener('click', function () {
+                sfxKlik();
+                cekLencanaKoneksiServer();
+                if (pinGuruTersimpan) muatDataRekapServer(pinGuruTersimpan, false);
+            });
+
+            document.getElementById('input-cari-rekap').addEventListener('input', renderIsiDasbor);
+            document.getElementById('filter-kelas-rekap').addEventListener('change', renderIsiDasbor);
+            document.getElementById('urutkan-rekap').addEventListener('change', renderIsiDasbor);
+
+            document.getElementById('btn-unduh-excel').addEventListener('click', unduhExcelCSV);
+            document.getElementById('btn-unduh-pdf').addEventListener('click', unduhLaporanPDF);
+            document.getElementById('btn-unduh-word').addEventListener('click', unduhWordDoc);
+        });
+    </script>
+</body>
+</html>
